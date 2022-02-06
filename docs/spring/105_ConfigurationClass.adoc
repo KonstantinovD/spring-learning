@@ -1,0 +1,27 @@
+=== @Configuration & конфигурационный класс
+
+See also docs in: +
+configuration_class_104/ConfigurationClassExample.java
+
+Конфигурационный класс может служить и для чтения определений компонентов Spring Beans, снабженных аннотациями (*_@Autowired_*, etc). В данном случае в конфигурационном классе не потребуются методы с аннотациями @Bean, но для того чтобы найти определения компонентов Spring Beans в классах Java, придется активизировать просмотр этих компонентов. Это делается в конфигурационном классе с помощью аннотации *_@ComponentScan_*, равнозначной элементу разметки *_<context: component-scanning .../>_*
+
+[source, java]
+----
+@ComponentScan(basePackages = {"com.gmail.konstantinovd"})
+@Configuration
+public class HelloWorldConfiguration {
+}
+----
+
+В приложениях может присутствовать как ХМL-файл конфигурации, так и конфигурационный класс. К счастью, конфигурирование в формате XML можно по-разному сочетать с конфигурированием на языке Java. Например, в конфигурационном классе можно импортировать определения компонентов SpringBeans из одного или нескольких ХМL-файлов конфигурации, используя аннотацию *_@ImportResource_*, как показано ниже. И тогда начальную загрузку бинов (и из XML, и из @Bean) можно выполнить с помощью одного и того же _ApplicationContext_ (в данном случае *_AnnotationConfigApplicationContext_*):
+
+[source, java]
+----
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportResource;
+
+@ImportResource(locations = {"classpath:spring/app-context-xml.xml"})
+@Configuration
+public class HelloWorldConfiguration {
+}
+----
