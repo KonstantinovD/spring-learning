@@ -1,0 +1,39 @@
+=== @Autowired, @Inject, @Resource
+
+Вместо аннотации *_@Autowired_* можно также воспользоваться аннотацией *_@Resource(name="messageProvider")_*. Аннотация _@Resource_ входит в общий набор аннотаций Java, определяемых в стандарте *_JSR-250_* для применения на платформах _JSE_ и _JEE_. В отличие от аннотации @Autowired, в аннотации @Resource поддерживается параметр name для указания более точных требований к внедрению зависимостей.
+
+Кроме того, в Spriпg поддерживается аннотация *_@Inject_*, внедренная в спецификацию *_JSR-299_* (Contexts and Dependency Injection for the Java ЕЕ Platform). Аннотация _@Inject_ *_практически равнозначна_* по своему поведению аннотации _@Autowired_ в Spring.
+
+==== Baeldung guide:
+
+link:https://www.baeldung.com/spring-annotations-resource-inject-autowire[link]
+
+==== Difference in @Resource and @Autowired
+
+link:https://overcoder.net/q/22605/resource-vs-autowired[link]
+
+Аннотации @Autowired (или @Inject) и @Resource работают одинаково хорошо. Но есть концептуальные различия: +
+@Resource получает ресурс по имени. Имя извлекается из имени аннотированного сеттера или поля, или оно берется из *_@Resource(name = "provider")_*. +
+@Inject или @Autowired ищут компонент по типу. +
+
+В Spring *_@Resource_* имплементирован таким образом, что если он не находит соответствующего бина, то начинает работать как _@Autowired_ и пытается найти бин по типу.
+
+- *_@Resource_* позволяет указать имя введенного bean -> *_@Resource(name = "provider")_*
+- *_@Autowired_* позволяет пометить его как необязательный -> *_@Autowired(required=false)_*.
+
+Начиная со *_Spring 4.3_*, @Autowired может внедрять *_lists_* и *_map_*. В ранних версиях с подобными объектами приходится использовать @Resource:
+
+[source, java]
+----
+@Resource(name="AdditionalParams")
+private Map<String, String> additionalParams;
+
+@Value("#{AdditionalProperties}") // or @Value
+private List<String> props;
+----
+
+Link to baending collections injection guide: link:https://www.baeldung.com/spring-injecting-collections[link]
+
+==== When use @Resource and @Autowired
+
+if you intend to express annotation-driven injection by name, do not primarily use *_@Autowired_* - even if is technically capable of referring to a bean name through *_@Qualifier_* values. Instead, prefer the JSR-250 *_@Resource_* annotation which is semantically defined to identify a specific target component by its unique name, with the declared type being irrelevant for the matching process.
