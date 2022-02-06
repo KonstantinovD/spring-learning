@@ -1,4 +1,4 @@
-package book.annotations_99;
+package book.p99_annotations;
 
 public interface MessageProvider {
   String getMessage();

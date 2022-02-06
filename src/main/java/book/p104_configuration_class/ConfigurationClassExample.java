@@ -1,7 +1,7 @@
-package book.configuration_class_104;
+package book.p104_configuration_class;
 
-import book.annotations_99.MessageProvider;
-import book.annotations_99.MessageRenderer;
+import book.p99_annotations.MessageProvider;
+import book.p99_annotations.MessageRenderer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

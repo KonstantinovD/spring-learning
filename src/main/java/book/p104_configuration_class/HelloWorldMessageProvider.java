@@ -1,6 +1,6 @@
-package book.configuration_class_104;
+package book.p104_configuration_class;
 
-import book.annotations_99.MessageProvider;
+import book.p99_annotations.MessageProvider;
 
 public class HelloWorldMessageProvider implements MessageProvider {
   @Override

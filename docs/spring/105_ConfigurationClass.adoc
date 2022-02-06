@@ -1,7 +1,7 @@
 === @Configuration & конфигурационный класс
 
 See also docs in: +
-configuration_class_104/ConfigurationClassExample.java
+p104_configuration_class/ConfigurationClassExample.java
 
 Конфигурационный класс может служить и для чтения определений компонентов Spring Beans, снабженных аннотациями (*_@Autowired_*, etc). В данном случае в конфигурационном классе не потребуются методы с аннотациями @Bean, но для того чтобы найти определения компонентов Spring Beans в классах Java, придется активизировать просмотр этих компонентов. Это делается в конфигурационном классе с помощью аннотации *_@ComponentScan_*, равнозначной элементу разметки *_<context: component-scanning .../>_*
 

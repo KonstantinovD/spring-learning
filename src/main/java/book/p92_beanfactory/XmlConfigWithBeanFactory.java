@@ -1,4 +1,4 @@
-package book.beanfactory_92;
+package book.p92_beanfactory;
 
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;

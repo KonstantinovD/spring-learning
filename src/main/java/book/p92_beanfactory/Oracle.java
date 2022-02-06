@@ -1,4 +1,4 @@
-package book.beanfactory_92;
+package book.p92_beanfactory;
 
 public interface Oracle {
     String defineMeaningOfLife();

@@ -1,4 +1,4 @@
-package book.constructor_confusion_112;
+package book.p112_constructor_confusion;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service("constructorConfusion")
 @PropertySource("classpath:application.properties")
-@ComponentScan(basePackages = "book.constructor_confusion_112")
+@ComponentScan(basePackages = "book.p112_constructor_confusion")
 public class ConstructorConfusion {
   private String someValue;
 

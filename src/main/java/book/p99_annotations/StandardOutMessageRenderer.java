@@ -1,4 +1,4 @@
-package book.annotations_99;
+package book.p99_annotations;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
