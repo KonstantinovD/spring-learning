@@ -1,0 +1,45 @@
+=== Bean scopes
+
+- Выбор режима получения экземпляров
+- Области видимости компонентов Spring Beans
+
+
+==== Выбор режима получения экземпляров
+
+В большинстве случаев очень nросто выяснить, какой именно режим nолучения экземnляров является для них nодходящим. Как nравило, scope _Singleton_ считается стандартным для компонентов Spring Beans.
+
+В общем, *_Singleton_* должны nрименяться в следующих случаях:
+
+- *_Общий объект без состояния._* Имеется объект, не поддерживающий состояние, и множество зависимых от него объектов. Состояние не поддерживается -> синхронизация не нужна -> не придется получать новый экземпляр Bean всякий раз, когда он требуется зависимому объекту для какой-нибудь обработки.
+- *_Общий объект с состоянием только для чтения._* Этот случай похож на предыдущий, но отличается поддержанием состояния только для чтения. Использование _Prototype_ только влечет дополнительные издержки.
+- *_Общий объект с разделяемым состоянием._* Если состояние Bean должно разделяться с другими объектами, то _Singleton_ будет идеальным выбором. Но в этом случае придется обеспечить синхронизацию при записи состояния.
+- *_Высокопроизводительные объекты с записываемым состоянием._* Если Bean интенсивно применяется в приложении, то может оказаться, что _Singleton_-scope + синхронизация всего доступа к нему для записи позволит добиться более высокой производительности, чем постоянное получение многих экземпляров этого объекта. Требуется синхронизация. Такой подход используется в тех случаях, когда в приложении создается большое количество зависимых Beans в течение длительного периода времени.
+
+*_Prototype_* должны применяться в перечисленных ниже случаях:
+
+- *_Объекты с записываемым состоянием._* Если имеется компонент Spring Bean с большой долей записываемого состояния, то может оказаться, что затраты на синхронизацию превышают затраты на получение нового экземпляра для обработки каждого запроса от зависимого объекта.
+- *_Объекты с закрытым состоянием._* В ряде случаев зависимым объектам требуется компонент Spring Bean с закрытым состоянием, чтобы зависимые объекты могли выполнять свою обработку раздельно.
+
+=== Области видимости компонентов Spring Beans
+
+[cols="1,8"]
+|===
+|singleton
+|(Default) Scopes a single bean definition to a single object instance for each Spring IoC container.
+
+|prototype
+|Spring получит новый экземпляр по запросу из приложения.
+
+|request
+|Scopes a single bean definition to the lifecycle of a single HTTP request. That is, each HTTP request has its own instance of a bean created off the back of a single bean definition. Only valid in the context of a web-aware Spring ApplicationContext.
+
+|session
+|Scopes a single bean definition to the lifecycle of an HTTP Session. Only valid in the context of a web-aware Spring ApplicationContext.
+
+|application
+|Scopes a single bean definition to the lifecycle of a ServletContext. Only valid in the context of a web-aware Spring ApplicationContext.
+
+|websocket
+|Scopes a single bean definition to the lifecycle of a WebSocket. Only valid in the context of a web-aware Spring ApplicationContext.
+|===
+
