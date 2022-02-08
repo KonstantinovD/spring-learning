@@ -29,6 +29,8 @@ public class Car implements InitializingBean, BeanNameAware,
     this.isGasolineEngine = isGasolineEngine;
   }
 
+  // IF    BeanNameAware implementing
+  // THEN  id бина передается в метод setBeanName()
   @Override
   public void setBeanName(String beanName) {
     this.beanName = beanName;
