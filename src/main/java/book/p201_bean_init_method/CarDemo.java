@@ -28,14 +28,14 @@ public class CarDemo {
       return new Car(90, "ZIL-130", true);
     }
 
-    @Bean(initMethod = "init")
+    @Bean(initMethod = "init", destroyMethod = "destroyBean")
     public Car carTwo() {
       Car car = new Car();
       car.setGasolineEngine(false);
       return car;
     }
 
-    @Bean(initMethod = "init")
+    @Bean(initMethod = "init", destroyMethod = "destroyBean")
     public Car carThree() {
       // uses technical propane as fuel
       return new Car(80,
@@ -52,6 +52,9 @@ public class CarDemo {
     for (Car c : carDemo.getCarList()) {
       System.out.println(c);
     }
+    System.out.println();
+
+    ctx.registerShutdownHook();
   }
 
 }

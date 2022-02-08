@@ -3,14 +3,17 @@ package book.p201_bean_init_method;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 @NoArgsConstructor
 @Data
-public class Car implements InitializingBean, BeanNameAware {
+public class Car implements InitializingBean, BeanNameAware,
+    DisposableBean {
 
   public static final int DEFAULT_MAX_SPEED = 150;
 
@@ -26,32 +29,28 @@ public class Car implements InitializingBean, BeanNameAware {
     this.isGasolineEngine = isGasolineEngine;
   }
 
-  // Метод инициализации делает приложения независимым от каркаса Spring,
-  // но при этом надо конфигурить метод инициализации для каждого Bean,
-  // который в нем нуждается.
-  // Интерфейс InitializingBean позволяет указывать обратный вызов при
-  // инициализации один раз для всех экземпляров класса компонента Bean,
-  // но это привязывает приложение к каркасу Spring.
-  // Аннотации применяются над методами; следует проверять, поддерживает
-  // ли контейнер IoC спецификацию JSR-250.
-
   @Override
   public void setBeanName(String beanName) {
     this.beanName = beanName;
     this.beanNamePrefix = "[" + this.beanName + "] ";
   }
 
-  // Чтобы исключить лишние внешние вызовы метода инициализации, его
-  // необходимо объявить private. Контейнер IoC сможет вызвать метод
-  // инициализации через рефлексию.
-  private void init() {
-    System.out.println(beanNamePrefix + "call init() method");
-    if (!StringUtils.hasText(this.name)) {
-      System.out.println(beanNamePrefix + "ERROR: You must set " +
-          "the name property of any beans of Car type!");
+  // Аннотации применяются над методами; следует проверять, поддерживает
+  // ли контейнер IoC спецификацию JSR-250.
+  // Интерфейс InitializingBean позволяет указывать обратный вызов при
+  // инициализации один раз для всех экземпляров класса компонента Bean,
+  // но это привязывает приложение к каркасу Spring.
+  // Метод инициализации делает приложения независимым от каркаса Spring,
+  // но при этом надо конфигурить метод инициализации для каждого Bean,
+  // который в нем нуждается.
+
+  @PostConstruct
+  private void postProcess() {
+    System.out.println(beanNamePrefix + "call @PostConstruct method");
+    if (this.isGasolineEngine) {
+      System.out.println(beanNamePrefix + "Car with gasoline engine");
     }
   }
-
 
   @Override
   public void afterPropertiesSet() throws Exception {
@@ -65,12 +64,34 @@ public class Car implements InitializingBean, BeanNameAware {
     }
   }
 
-  @PostConstruct
-  public void postProcess() {
-    System.out.println(beanNamePrefix + "call @PostConstruct method");
-    if (this.isGasolineEngine) {
-      System.out.println(beanNamePrefix + "Car with gasoline engine");
+  // Чтобы исключить лишние внешние вызовы метода инициализации, его
+  // необходимо объявить private. Контейнер IoC сможет вызвать метод
+  // инициализации через рефлексию.
+  private void init() {
+    System.out.println(beanNamePrefix + "call @Bean init() method");
+    if (!StringUtils.hasText(this.name)) {
+      System.out.println(beanNamePrefix + "ERROR: You must set " +
+          "the name property of any beans of Car type!");
     }
+  }
+
+
+  @PreDestroy
+  private void preDestroyProcess() {
+    System.out.println(beanNamePrefix +
+        "call @PreDestroy method, maxSpeed = " + this.maxSpeed);
+  }
+
+  @Override
+  public void destroy() throws Exception {
+    System.out.println(beanNamePrefix +
+        "call DisposableBean destroy() method, name = " + this.name);
+  }
+
+  private void destroyBean() {
+    System.out.println(beanNamePrefix +
+        "call @Bean destroyBean() method, isGasolineEngine = "
+        + this.isGasolineEngine);
   }
 
   @Override
