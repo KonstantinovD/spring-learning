@@ -1,4 +1,4 @@
-package book.p201_bean_init_method;
+package book.p201_bean_lifecycle_methods;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

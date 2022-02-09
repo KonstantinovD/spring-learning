@@ -1,4 +1,4 @@
-package book.p201_bean_init_method;
+package book.p201_bean_lifecycle_methods;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +21,7 @@ public class CarDemo {
   private List<Car> carList;
 
   @Configuration
-  @ComponentScan(basePackages = "book.p201_bean_init_method")
+  @ComponentScan(basePackages = "book.p201_bean_lifecycle_methods")
   static class CarConfig {
     @Bean
     public Car carOne() {
