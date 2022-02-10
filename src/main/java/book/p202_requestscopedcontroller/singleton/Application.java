@@ -7,7 +7,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 // test endpoint with
-// curl http://localhost:8080/thread & curl http://localhost:8080/thread & curl http://localhost:8080/thread
+// curl http://localhost:8080/thread/8 & curl http://localhost:8080/thread/2 & curl http://localhost:8080/thread/0
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class Application {
   public static void main(String[] args) {
