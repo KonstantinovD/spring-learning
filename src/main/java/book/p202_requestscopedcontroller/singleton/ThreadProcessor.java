@@ -1,8 +1,8 @@
 package book.p202_requestscopedcontroller.singleton;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class ThreadProcessor {
       throw new RuntimeException("Timeout is reached");
     } catch (Exception ex) {
       String message = "unhandled exception";
-      if (StringUtils.isNoneEmpty(ex.getMessage())) {
+      if (!StringUtils.hasText(ex.getMessage())) {
         message = ex.getMessage();
       }
       throw new IllegalArgumentException(message);
