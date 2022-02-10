@@ -17,3 +17,14 @@ MessageDigest md5 = MessageDigest.getinstance("MDS");
 
 Если каркас Spring должен управлять процессом создания объекта типа *_MessageDigest_*, то самое лучшее, что можно сделать без интерфейса *_FactoryBean_*, - предусмотреть в бине свойство (например, _algorithmName_) и затем сделать *_обратный вызов при инициализации_*, чтобы обратиться к методу *_MessageDigest.getInstance()_*. Однако, эту логику можно инкапсулировать в самом бине с помощью интерфейса _FactoryBean_. И тогда в любых других бинах, где требуется экземпляр класса *_MessageDigest_*, достаточно _объявить свойство_ (например, _messageDigest_) и получить нужный экземпляр с помощью интерфейса FactoryBean. Пример реализации интерфейса FactoryBean для выполнения этих функций: +
 **__See__** _p230_factory_beans/MessageDigestFactoryBean.java_, _p230_factory_beans/..._
+
+==== Непосредственный доступ к фабрике компонентов Spring Beans
+
+В связи с тем, что каркас Spring автоматически удовлетворяет любые ссылки на фабрику компонентов Spring Beans, выдавая объекты, созданные этой фабрикой, возникает вопрос: можно ли получить доступ к такой фабрике напрямую? Да, можно. Доступ к фабрике компонентов Spring Beans осуществляется просто. Для этого имя компонента Spring Bean достаточно предварить в вызове метода getBean () знаком амперсанда:
+
+[source, java]
+----
+MessageDigestFactoryBean factoryBean = (MessageDigestFactoryBean) ctx.getBean("&shaDigest");
+----
+
+**__See__** _p230_factory_beans/MessageDigestDemo.java_

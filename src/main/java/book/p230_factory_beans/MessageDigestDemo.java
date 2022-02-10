@@ -40,6 +40,21 @@ public class MessageDigestDemo {
               MessageDigestConfig.class);
       MessageDigester digester = ctx.getBean(MessageDigester.class);
       digester.digest("Hello world!");
+
+      // Непосредственный доступ к фабрике компонентов Spring Beans
+      // применяется в нескольких местах исходного кода Spring, но в
+      // приложении его лучше так не применять. Интерфейс FactoryBean
+      // - часть инфраструктуры IoC.
+      MessageDigestFactoryBean factoryBean =
+          (MessageDigestFactoryBean)
+              ctx.getBean("&factoryBeanOne");
+      try {
+        System.out.println(factoryBean
+            .getObject().digest("Factory received".getBytes()));
+      } catch (Exception ex) {
+        ex.printStackTrace();
+      }
+
       ctx.close();
     }
   }
