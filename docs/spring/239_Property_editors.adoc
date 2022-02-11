@@ -7,3 +7,18 @@
 Все редакторы свойств, входящие в состав либы _org.springframework.spring-beans_, можно увидеть в  в каталоге *_org.springframework.beans.propertyeditors_*. Они расширяют класс *_java.beans.PropertyEditorSupport_* и могут быть использованы для неявного преобразования строковых литералов типа _String_ в значения свойств, внедряемых в Beans. Это означает, что они предварительно зарегистрированы средствами интерфейса *_BeanFactory_*.
 
 *_See_* _p239_property_editors/PropertyEditorBean.java_, _spring/p239_Property_editors/app-property-context.xml_
+
+==== Кастомный редактор свойств
+
+Иногда приходится создавать собственный редактор свойств для поддержки одного класса или целого ряда классов в приложении. В каркасе Spring обеспечивается полная поддержка регистрации специальных редакторов свойств через класс *_PropertyEditorSupport_*, который можно расширить в специальных редакторах свойств, реализовав один только метод *_setAsText()_*:
+
+[source, java]
+----
+public class NamePropertyEditor exteпds PropertyEditorSupport {
+  @Override
+  public void setAsText(Striпg text) throws IllegalArguтeпtExceptioп {
+    Striпg[] name = text.split("\\s");
+    setValue(пew FullName(name[0], name[1]));
+  }
+}
+----
