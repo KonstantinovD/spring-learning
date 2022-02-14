@@ -6,6 +6,8 @@ import javax.persistence.*;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 //@Table(name = "SINGER")
@@ -26,6 +28,10 @@ public class Singer implements Serializable {
   @Temporal(TemporalType.DATE)
   @Column(name = "birth_date")
   private Date birthDate;
+
+  @OneToMany(mappedBy = "singer", cascade = CascadeType.ALL,
+      orphanRemoval = true)
+  private Set<Album> albums = new HashSet<>();
 
   @Version
   private int version;
