@@ -2,6 +2,7 @@ package book.p490_start_with_hibernate.entity;
 
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.*;
@@ -17,9 +18,10 @@ public class Instrument implements Serializable {
   @Column(name = "instrument_id")
   private String instrumentId;
 
+  @EqualsAndHashCode.Exclude
   @ToString.Exclude
   @ManyToMany(cascade = { CascadeType.ALL })
-  @JoinTable(name = "singer instrument",
+  @JoinTable(name = "singer_instrument",
       joinColumns = @JoinColumn(name = "instrument_id"),
       inverseJoinColumns = @JoinColumn(name = "singer_id"))
   private Set<Singer> singers = new HashSet<>();

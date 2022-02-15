@@ -20,9 +20,20 @@ public class SingerDaoImpl implements SingerDao {
   // Session, который получается из фабрики сеансов,
   // реализуемой в компоненте SessionFactory.
   @Transactional(readOnly = true)
-  @Override
   public List<Singer> findAll() {
     return sessionFactory.getCurrentSession()
         .createQuery("from Singer s").list();
+  }
+
+  @Transactional(readOnly = true)
+  public List<Singer> findAllWithAlbum() {
+    return sessionFactory.getCurrentSession()
+        .getNamedQuery("Singer.findAllWithAlbum").list();
+  }
+
+  @Transactional(readOnly = true)
+  public List<Singer> findAllWithAlbumAndInstrument() {
+    return sessionFactory.getCurrentSession()
+        .getNamedQuery("Singer.findAllWithAlbumAndInstrument").list();
   }
 }

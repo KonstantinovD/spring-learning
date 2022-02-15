@@ -12,11 +12,20 @@ import java.util.Set;
 @Entity
 //@Table(name = "SINGER")
 @Data
+@NamedQueries({
+    @NamedQuery(name = "Singer.findAllWithAlbum",
+        query = "select distinct s from Singer s " +
+            "left join fetch s.albums a"),
+    @NamedQuery(name = "Singer.findAllWithAlbumAndInstrument",
+        query = "select distinct s from Singer s " +
+            "left join fetch s.albums a " +
+            "left join fetch s.instruments i")
+})
 public class Singer implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "ID")
+  @Column(name = "id")
   private Integer id;
 
   @Column(name = "first_name")
@@ -29,14 +38,16 @@ public class Singer implements Serializable {
   @Column(name = "birth_date")
   private Date birthDate;
 
+  @EqualsAndHashCode.Exclude
   @ToString.Exclude
   @OneToMany(mappedBy = "singer", cascade = CascadeType.ALL,
       orphanRemoval = true)
   private Set<Album> albums = new HashSet<>();
 
+  @EqualsAndHashCode.Exclude
   @ToString.Exclude
   @ManyToMany(cascade = { CascadeType.ALL })
-  @JoinTable(name = "singer instrument",
+  @JoinTable(name = "singer_instrument",
       joinColumns = @JoinColumn(name = "singer_id"),
       inverseJoinColumns = @JoinColumn(name = "instrument_id"))
   private Set<Instrument> instruments = new HashSet<>();

@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface SingerDao {
   List<Singer> findAll();
+  List<Singer> findAllWithAlbumAndInstrument();
+  List<Singer> findAllWithAlbum();
 }
