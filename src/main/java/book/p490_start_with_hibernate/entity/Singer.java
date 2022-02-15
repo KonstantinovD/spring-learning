@@ -29,16 +29,19 @@ public class Singer implements Serializable {
   @Column(name = "birth_date")
   private Date birthDate;
 
+  @ToString.Exclude
   @OneToMany(mappedBy = "singer", cascade = CascadeType.ALL,
       orphanRemoval = true)
   private Set<Album> albums = new HashSet<>();
 
+  @ToString.Exclude
   @ManyToMany(cascade = { CascadeType.ALL })
   @JoinTable(name = "singer instrument",
       joinColumns = @JoinColumn(name = "singer_id"),
       inverseJoinColumns = @JoinColumn(name = "instrument_id"))
   private Set<Instrument> instruments = new HashSet<>();
 
+  @ToString.Exclude
   @Version
   private int version;
 }

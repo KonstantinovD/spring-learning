@@ -2,6 +2,7 @@ package book.p490_start_with_hibernate.entity;
 
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -16,6 +17,7 @@ public class Instrument implements Serializable {
   @Column(name = "instrument_id")
   private String instrumentId;
 
+  @ToString.Exclude
   @ManyToMany(cascade = { CascadeType.ALL })
   @JoinTable(name = "singer instrument",
       joinColumns = @JoinColumn(name = "instrument_id"),

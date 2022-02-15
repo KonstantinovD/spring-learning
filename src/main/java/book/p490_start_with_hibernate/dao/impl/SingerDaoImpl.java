@@ -16,6 +16,9 @@ public class SingerDaoImpl implements SingerDao {
   @Resource(name = "sessionFactory")
   private SessionFactory sessionFactory;
 
+  // При взаимодействии с базой данных Hibernate работает с интерфейсом
+  // Session, который получается из фабрики сеансов,
+  // реализуемой в компоненте SessionFactory.
   @Transactional(readOnly = true)
   @Override
   public List<Singer> findAll() {

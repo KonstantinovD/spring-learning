@@ -1,6 +1,7 @@
 package book.p490_start_with_hibernate.entity;
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -23,6 +24,7 @@ public class Album implements Serializable {
   @Column(name = "release_date")
   private Date releaseDate;
 
+  @ToString.Exclude
   @ManyToOne
   @JoinColumn(name = "singer_id")
   private Singer singer;
