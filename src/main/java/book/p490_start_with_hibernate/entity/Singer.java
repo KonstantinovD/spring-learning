@@ -33,6 +33,12 @@ public class Singer implements Serializable {
       orphanRemoval = true)
   private Set<Album> albums = new HashSet<>();
 
+  @ManyToMany(cascade = { CascadeType.ALL })
+  @JoinTable(name = "singer instrument",
+      joinColumns = @JoinColumn(name = "singer_id"),
+      inverseJoinColumns = @JoinColumn(name = "instrument_id"))
+  private Set<Instrument> instruments = new HashSet<>();
+
   @Version
   private int version;
 }
