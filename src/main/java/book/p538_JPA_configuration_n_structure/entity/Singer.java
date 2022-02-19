@@ -50,7 +50,8 @@ public class Singer implements Serializable {
   @EqualsAndHashCode.Exclude
   @ToString.Exclude
   @OneToMany(mappedBy = "singer", cascade = CascadeType.ALL,
-      orphanRemoval = true)
+      orphanRemoval = true) // orphanRemoval=true позволяет
+  // удалять альбомы у певца простым удалением альбома из сета
   private Set<Album> albums = new HashSet<>();
 
   @EqualsAndHashCode.Exclude

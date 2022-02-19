@@ -1,9 +1,9 @@
 package book.p538_JPA_configuration_n_structure;
 
 import book.p538_JPA_configuration_n_structure.config.JpaConfig;
-import book.p538_JPA_configuration_n_structure.entity.Album;
-import book.p538_JPA_configuration_n_structure.entity.Instrument;
 import book.p538_JPA_configuration_n_structure.entity.Singer;
+import book.p538_JPA_configuration_n_structure.helpers.EntityPrinterUtils;
+import book.p538_JPA_configuration_n_structure.helpers.QueryHelper;
 import book.p538_JPA_configuration_n_structure.service.SingerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
@@ -19,10 +19,13 @@ public class SpringJPADemo {
     ConfigurableApplicationContext ctx =
         SpringApplication.run(JpaConfig.class);
     SingerService singerService = ctx.getBean(SingerService.class);
+    QueryHelper queryHelper = ctx.getBean(QueryHelper.class);
 
     call_listAll(singerService);
     call_listSingersWAnI(singerService);
     call_findById(singerService);
+
+    queryHelper.createUpdateDelete();
   }
 
   private static void call_listAll(SingerService singerService) {
@@ -39,7 +42,7 @@ public class SpringJPADemo {
   private static void call_findById(SingerService singerService) {
     Singer singer = singerService.findById(2);
     log.info(" ---- Show singer by id:");
-    showFetchSingerInfo(singer);
+    EntityPrinterUtils.showFetchSingerInfo(singer);
   }
 
   private static void showSingers(List<Singer> singers) {
@@ -53,21 +56,7 @@ public class SpringJPADemo {
       List<Singer> singers) {
     log.info(" ---- Listing singers with instruments:");
     for (Singer singer : singers) {
-      showFetchSingerInfo(singer);
-    }
-  }
-
-  private static void showFetchSingerInfo(Singer singer) {
-    log.info(singer.toString());
-    if (singer.getAlbums() != null) {
-      for (Album album : singer.getAlbums()) {
-        log.info("\t" + album.toString());
-      }
-    }
-    if (singer.getInstruments() != null) {
-      for (Instrument instrument : singer.getInstruments()) {
-        log.info("\tlnstrument: " + instrument.getInstrumentId());
-      }
+      EntityPrinterUtils.showFetchSingerInfo(singer);
     }
   }
 }

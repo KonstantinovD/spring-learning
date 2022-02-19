@@ -8,7 +8,7 @@ public interface SingerService {
   List<Singer> findAll();
   List<Singer> listSingersWithAlbumAndInstrument();
   Singer findById(Integer id);
-//  Singer save(Singer singer);
-//  void delete(Singer singer);
+  Singer save(Singer singer);
+  void delete(Singer singer);
 //  List<Singer> findAllByNativeQuery();
 }

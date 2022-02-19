@@ -7,6 +7,7 @@ import lombok.ToString;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Table(name = "album")
@@ -33,4 +34,17 @@ public class Album implements Serializable {
 
   @Version
   private int version;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Album album = (Album) o;
+    return id.equals(album.id) && title.equals(album.title);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, title);
+  }
 }

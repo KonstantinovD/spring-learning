@@ -45,5 +45,25 @@ public class SingerServiceImpl implements SingerService {
     return query.getSingleResult();
   }
 
+  @Override
+  public Singer save(Singer singer) {
+    if (singer.getId() == null) {
+      log.info("Inserting new Singer");
+      em.persist(singer);
+    } else {
+      em.merge(singer);
+      log.info("Updating existing singer");
+    }
+    log.info("Singer saved with id: " + singer.getId());
+    return singer;
+  }
 
+  @Override
+  public void delete(Singer singer) {
+    Singer mergedSinger = em.merge(singer);
+    em.remove(mergedSinger);
+
+    log.info("Singer with id: " + singer.getId()
+        + "deleted successfully");
+  }
 }
