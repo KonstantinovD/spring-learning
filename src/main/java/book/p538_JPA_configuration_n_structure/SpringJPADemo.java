@@ -19,8 +19,10 @@ public class SpringJPADemo {
     ConfigurableApplicationContext ctx =
         SpringApplication.run(JpaConfig.class);
     SingerService singerService = ctx.getBean(SingerService.class);
+
     call_listAll(singerService);
     call_listSingersWAnI(singerService);
+    call_findById(singerService);
   }
 
   private static void call_listAll(SingerService singerService) {
@@ -34,6 +36,12 @@ public class SpringJPADemo {
     showSingersWithAlbumAndInstrument(singers);
   }
 
+  private static void call_findById(SingerService singerService) {
+    Singer singer = singerService.findById(2);
+    log.info(" ---- Show singer by id:");
+    showFetchSingerInfo(singer);
+  }
+
   private static void showSingers(List<Singer> singers) {
     log.info(" ---- Listing singers:");
     for (Singer singer : singers) {
@@ -45,16 +53,20 @@ public class SpringJPADemo {
       List<Singer> singers) {
     log.info(" ---- Listing singers with instruments:");
     for (Singer singer : singers) {
-      log.info(singer.toString());
-      if (singer.getAlbums() != null) {
-        for (Album album : singer.getAlbums()) {
-          log.info("\t" + album.toString());
-        }
+      showFetchSingerInfo(singer);
+    }
+  }
+
+  private static void showFetchSingerInfo(Singer singer) {
+    log.info(singer.toString());
+    if (singer.getAlbums() != null) {
+      for (Album album : singer.getAlbums()) {
+        log.info("\t" + album.toString());
       }
-      if (singer.getInstruments() != null) {
-        for (Instrument instrument : singer.getInstruments()) {
-          log.info("\tlnstrument: " + instrument.getInstrumentId());
-        }
+    }
+    if (singer.getInstruments() != null) {
+      for (Instrument instrument : singer.getInstruments()) {
+        log.info("\tlnstrument: " + instrument.getInstrumentId());
       }
     }
   }

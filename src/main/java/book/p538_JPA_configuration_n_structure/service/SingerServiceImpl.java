@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import java.util.List;
 
 @Slf4j
@@ -34,6 +35,14 @@ public class SingerServiceImpl implements SingerService {
   public List<Singer> listSingersWithAlbumAndInstrument() {
     return em.createNamedQuery(
         Singer.FIND_ALL_WITH_ALBUM, Singer.class).getResultList();
+  }
+
+  @Override
+  public Singer findById(Integer id) {
+    TypedQuery<Singer> query = em.createNamedQuery(
+        Singer.FIND_SINGER_BY_ID, Singer.class);
+    query.setParameter("id", id);
+    return query.getSingleResult();
   }
 
 

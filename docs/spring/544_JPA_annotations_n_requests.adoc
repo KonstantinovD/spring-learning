@@ -23,5 +23,7 @@
 
 А метод _SingerServiceImpl.listSingersWithAlbumAndInstrument()_ будет выбирать все связанные альбомы и музыкальные инструменты. В нем используется другой именованный запрос с активизированным предложением *_left join fetch_*.
 
+Также представлена возможность найти Singer по его id в методе _SingerServiceImpl.findById()_
+
 Пример работы с этими методами можно увидеть в: +
-*_See_* _SpringJPADemo.call_listAll(...)_, _SpringJPADemo.call_listSingersWAnI(...)_
+*_See_* _SpringJPADemo.call_listAll(...)_, _SpringJPADemo.call_listSingersWAnI(...)_, _SingerServiceImpl.call_findById(...)_
