@@ -5,7 +5,6 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -22,11 +21,7 @@ import java.util.Properties;
 @Slf4j
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories( // for book.p580_Spring_Data_JPA_start
-    basePackages = "book.p580_Spring_Data_JPA_start")
 @ComponentScan(basePackages = "book.p538_JPA_configuration_n_structure")
-// for book.p580_Spring_Data_JPA_start
-@ComponentScan(basePackages = "book.p580_Spring_Data_JPA_start")
 public class JpaConfig {
 
   @Bean

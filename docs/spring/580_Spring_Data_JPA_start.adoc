@@ -3,6 +3,7 @@
 - Введение [p 580]
 - Абстракция хранилища в Spring Data JРА для операций в БД; CrudRepository [p 580]
 - JpaRepository [p 588]
+- Кастомные запросы, @Query [p 590]
 
 === Введение
 
@@ -50,3 +51,8 @@ public interface CrudRepository<T, ID extends Serializable> extends Repository<T
 
 image:img/SpringDataRepositoryInheritance.png[]
 
+=== Кастомные запросы, @Query
+
+В сложных приложениях могут потребоваться специальные запросы, которые нельзя автоматически вывести средствами Spring. В таком случае запрос должен быть явно определен с помощью аннотации *_@Query_*. Воспользуемся этой аннотацией для поиска всех музыкальных альбомов, содержащих слово The в своем названии. С этой целью объявим интерфейс AlbumRepository:
+
+*_See_* _p580_Spring_Data_JPA_start/repository/AlbumRepository.java_, _p580_Spring_Data_JPA_start/SpringDataJpaDemo.java_

@@ -27,16 +27,14 @@ public class SpringDataJpaSingerServiceImpl implements SpringDataJpaSingerServic
   @Transactional(readOnly = true)
   @Override
   public List<Singer> findByFirstName(String firstName) {
-    return convertToList(
-        singerRepository.findByFirstName(firstName));
+    return singerRepository.findByFirstName(firstName);
   }
 
   @Transactional(readOnly = true)
   @Override
   public List<Singer> findByFirstNameAndLastName(String firstName, String lastName) {
-    return convertToList(
-        singerRepository
-            .findByFirstNameAndLastName(firstName, lastName));
+    return singerRepository
+        .findByFirstNameAndLastName(firstName, lastName);
   }
 
   private List<Singer> convertToList(Iterable<Singer> iterable) {
