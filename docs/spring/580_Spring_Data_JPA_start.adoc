@@ -1,7 +1,8 @@
 == Spring Data JPA
 
 - Введение [p 580]
-- Абстракция хранилища в Spring Data JРА для операций в БД [p 580]
+- Абстракция хранилища в Spring Data JРА для операций в БД; CrudRepository [p 580]
+- JpaRepository [p 588]
 
 === Введение
 
@@ -10,7 +11,7 @@
 - _Абстракция информационного хранилища_ типа *_Repository_* (*_CrudRepository_*, *_JpaRepository_*)
 - *_Приемник сущностей_*, предназначенный для отслеживания в базе данных аудиторской информации по классам сущностей
 
-=== Абстракция хранилища в Spring Data JРА для операций в БД
+=== Абстракция хранилища в Spring Data JРА для операций в БД; CrudRepository
 
 Одним из главных понятий в проекте Spring Data и всех его подпроектах является *_абстракция информационного хранилища_* типа _Repository_, относящаяся к проекту _Spring Data Commons_ (link:https://github.com/spring-projects/spring-data-commons[github]). В Spring Data JPA _абстракция информационного хранилища_ служит *_оболочкой_*, в которую заключается интерфейс *_EntityManager_* и которая предоставляет более простой интерфейс для доступа к данным через интерфейс JPA.
 
@@ -37,4 +38,15 @@ public interface CrudRepository<T, ID extends Serializable> extends Repository<T
 
 В отличие от стандартной конфигурации JPA, конфигурация _Spring Data_ содержит аннотацию *_@EnableJpaRepositories_*, которая предписывает использовать JPA репозитории. А остальные зависимости (от компонентов *_emf_* и *_transactionManager_*) внедряются автоматически контейнером IoC в Spring. При этом использование _Spring Data_ не запрещает использование конфигов с настройками типа бинов _transactionManager_, но позволяет обойтись и без них, оставив в конфигах только _dataSource_ +
 *_See_* _p580_Spring_Data_JPA_start/config/SpringDataConfig.java_
+
+=== JpaRepository
+
+*_PagingAndSortingRepository_* extends *_CrudRepository_* +
+*_JpaRepository_* extends *_PagingAndSortingRepository_*
+
+- The *_CrudRepository_* interface provides methods for CRUD operations, so it allows you to _create, read, update and delete_ records without having to define your own methods.
+- The *_PagingAndSortingRepository_* provides additional methods to retrieve entities using *_pagination and sorting_*.
+- The *_JpaRepository_* provides some JPA-related methods such as *_flushing the persistence context_* and *_deleting records in a batch_*.
+
+image:img/SpringDataRepositoryInheritance.png[]
 
