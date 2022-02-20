@@ -26,6 +26,23 @@ import java.util.Set;
             "left join fetch s.albums a " +
             "left join fetch s.instruments i")
 })
+@SqlResultSetMapping(name = "singerResult",
+    entities = @EntityResult(entityClass = Singer.class)
+)
+@SqlResultSetMapping(name = "singerResult2",
+    columns = {
+    @ColumnResult(name = "id"), @ColumnResult(name = "last_name")},
+    entities = @EntityResult(entityClass = Singer.class)
+)
+@SqlResultSetMapping(name = "singerResult3",
+    classes={
+        @ConstructorResult(
+            targetClass=ReducedSinger.class,
+            columns={
+                @ColumnResult(name="first_name", type=String.class),
+                @ColumnResult(name="last_name", type=String.class),
+                @ColumnResult(name="birth_date")
+            })})
 public class Singer implements Serializable {
 
   public static final String FIND_ALL = "Singer.findAll";

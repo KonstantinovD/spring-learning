@@ -1,5 +1,13 @@
 === JPA аннотации и запросы
 
+- JPA аннотации
+- Запрашивание данных на языке JPQL
+- Вставка данных
+- Обновление данных
+- Удаление данных
+- Native queries, @SqlResultSetMapping, запрос non-entity классов
+
+
 ==== JPA аннотации
 
 Код, написанный ранее для _Hibernate_, ксодержит совместимые с JPA аннотации пакета _javax.persistence_, а это означает, что они уже совместимы с _JPA_.
@@ -61,3 +69,31 @@ album1.setSinger(singer);
 Прежде всего, необходимо вызвать метод *_EntityManager.merge()_* для объединения состояния сущности с текущим контекстом сохраняемости. Затем вызывается метод *_EntityManager.remove()_*, которому передается смерженный экземпляр. Метод _remove()_ удаляет запись о певце, а также все связанные с ним сведения, включая альбомы и музыкальные инструменты, поскольку в преобразовании было задано условие cascade=CascadeType. ALL.
 
 *_See_* _SingerServiceImpl.delete()_, _QueryHelper.delete(...)_
+
+===== Native queries, @SqlResultSetMapping, запрос non-entity классов
+
+В JPA поддерживается выполнение собственных запросов. _EntityManager_ отправит такой запрос базе данных в исходном виде, не производя никакого преобразования или видоизменений. Пример: +
+*_See_* _QueryHelper.checkNativeQuery()_, _SingerServiceImpl.findSingersByNativeQuery()_
+
+Главное преимущество, которое дает применение собственных запросов в JPA, заключается в преобразовании результирующего набора типа _ResulSet_ в классы сущностностей, преобразованных по принципу ORM. Кроме преобразованного объекта предметной области, можно передавать строку, обозначающую наименование преобразования результирующего набора SQL. Преобразование результирующего набора SQL определяется на уровне класса сущности с помощью аннотации *_@SqlResultSetMapping_*, как показано ниже. В свою очередь, преобразование результирующего набора SQL может состоять из одного или более преобразования сущностей и столбцов.
+
+"Грубая настройка" столбцов в *_@SqlResultSetMapping()_* приведет к тому, что мы будем получать массив объектов *_Object[]_*. Пример такого _@SqlResultSetMapping_ - *_"singerResult2"_* +
+*_See_* _SingerServiceImpl.findObjectsByNativeQuery()_
+
+Но *_@SqlResultSetMapping()_* может быть *_очень полезен_*, если мы хотим, например:
+
+1. Выбрать для преобразования *_не все столбцы_* некоторой entity, а а часть из них.
+2. Получить результат в виде *_не entity класса_*
+
+Примером такого non-entity класса является _ReducedSinger.java_, который, к тому же, еще и _не serializable_. Производится выборка ограниченного количества столбцов (_REDUCED_SINGER_NATIVE_QUERY_), после чего применяется _@SqlResultSetMapping_ - *_"singerResult3"_*. Данный setMapping имеет под собой анноташку *_@ConstructorResult_*, которая раскладывает значения из квери в конструктор _ReducedSinger.java_. +
+*_See_* _SingerServiceImpl.findReducesSingersByNativeQuery()_ +
+
+Важное замечание: мы не можем *_напрямую_* выполнить преобразование к _ReducedSinger.java_ через _ReducedSinger.class_:
+[source, java]
+----
+  public List<ReducedSinger> findReducesSingersByNativeQuery() {
+    return em.createNativeQuery(REDUCED_SINGER_NATIVE_QUERY,
+        ReducedSinger.class).getResultList();
+  }
+----
+Поскольку в этом случае мы получим исключение *_org.hibernate.MappingException: Unknown entity: ReducedSinger_*. Именно поэтому мы и используем *_@SqlResultSetMapping_*.

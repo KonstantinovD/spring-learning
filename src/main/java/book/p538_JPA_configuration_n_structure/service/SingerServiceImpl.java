@@ -1,5 +1,6 @@
 package book.p538_JPA_configuration_n_structure.service;
 
+import book.p538_JPA_configuration_n_structure.entity.ReducedSinger;
 import book.p538_JPA_configuration_n_structure.entity.Singer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -17,7 +18,9 @@ import java.util.List;
 @Transactional
 public class SingerServiceImpl implements SingerService {
   public static final String ALL_SINGER_NATIVE_QUERY =
-      "select id, first_name, last_name, birth_date from singer";
+      "select id, first_name, last_name, birth_date, version from singer";
+  public static final String REDUCED_SINGER_NATIVE_QUERY =
+      "select first_name, last_name, birth_date from singer";
 
   // В основу JPA положен интерфейс EntityManager (see JPA structure)
   @PersistenceContext
@@ -65,5 +68,23 @@ public class SingerServiceImpl implements SingerService {
 
     log.info("Singer with id: " + singer.getId()
         + "deleted successfully");
+  }
+
+  @Override
+  public List<Singer> findSingersByNativeQuery() {
+    return em.createNativeQuery(
+        ALL_SINGER_NATIVE_QUERY, "singerResult").getResultList();
+  }
+
+  @Override
+  public List<Object[]> findObjectsByNativeQuery() {
+    return em.createNativeQuery(ALL_SINGER_NATIVE_QUERY,
+        "singerResult2").getResultList();
+  }
+
+  @Override
+  public List<ReducedSinger> findReducesSingersByNativeQuery() {
+    return em.createNativeQuery(REDUCED_SINGER_NATIVE_QUERY,
+        "singerResult3").getResultList();
   }
 }

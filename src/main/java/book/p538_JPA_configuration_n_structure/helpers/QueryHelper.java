@@ -1,6 +1,7 @@
 package book.p538_JPA_configuration_n_structure.helpers;
 
 import book.p538_JPA_configuration_n_structure.entity.Album;
+import book.p538_JPA_configuration_n_structure.entity.ReducedSinger;
 import book.p538_JPA_configuration_n_structure.entity.Singer;
 import book.p538_JPA_configuration_n_structure.service.SingerService;
 import lombok.AllArgsConstructor;
@@ -22,6 +23,29 @@ public class QueryHelper {
     Singer s = insert();
     s = update(s);
     delete(s);
+  }
+
+  public void checkNativeQuery() {
+    log.info("--- Test native query - only singers");
+    List<Singer> singersList = singerService.findSingersByNativeQuery();
+    for (Singer s : singersList) {
+      log.info(s.toString());
+    }
+
+    log.info("--- Test native query - SqlResultSetMapping");
+    List<Object[]> objectArrays =
+        singerService.findObjectsByNativeQuery();
+    for (Object[] objArray : objectArrays) {
+      log.info(objArray[0].toString());
+      log.info("Id: {}, Name: {}", objArray[1], objArray[2]);
+    }
+
+    log.info("--- Test native query - ReducedSinger SqlResultSetMapping");
+    List<ReducedSinger> reducedSingers =
+        singerService.findReducesSingersByNativeQuery();
+    for (ReducedSinger reduced : reducedSingers) {
+      log.info(reduced.toString());
+    }
   }
 
   public Singer insert() {

@@ -26,6 +26,7 @@ public class SpringJPADemo {
     call_findById(singerService);
 
     queryHelper.createUpdateDelete();
+    queryHelper.checkNativeQuery();
   }
 
   private static void call_listAll(SingerService singerService) {

@@ -1,5 +1,6 @@
 package book.p538_JPA_configuration_n_structure.service;
 
+import book.p538_JPA_configuration_n_structure.entity.ReducedSinger;
 import book.p538_JPA_configuration_n_structure.entity.Singer;
 
 import java.util.List;
@@ -10,5 +11,7 @@ public interface SingerService {
   Singer findById(Integer id);
   Singer save(Singer singer);
   void delete(Singer singer);
-//  List<Singer> findAllByNativeQuery();
+  List<Singer> findSingersByNativeQuery();
+  List<Object[]> findObjectsByNativeQuery();
+  List<ReducedSinger> findReducesSingersByNativeQuery();
 }
