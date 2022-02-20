@@ -27,23 +27,27 @@ public class SpringJPADemo {
 
     queryHelper.createUpdateDelete();
     queryHelper.checkNativeQuery();
+    queryHelper.runCriteriaQuery();
   }
 
   private static void call_listAll(SingerService singerService) {
     List<Singer> singers = singerService.findAll();
     showSingers(singers);
+    EntityPrinterUtils.printSeparator();
   }
 
   private static void call_listSingersWAnI(SingerService singerService) {
     List<Singer> singers =
         singerService.listSingersWithAlbumAndInstrument();
     showSingersWithAlbumAndInstrument(singers);
+    EntityPrinterUtils.printSeparator();
   }
 
   private static void call_findById(SingerService singerService) {
     Singer singer = singerService.findById(2);
     log.info(" ---- Show singer by id:");
     EntityPrinterUtils.showFetchSingerInfo(singer);
+    EntityPrinterUtils.printSeparator();
   }
 
   private static void showSingers(List<Singer> singers) {

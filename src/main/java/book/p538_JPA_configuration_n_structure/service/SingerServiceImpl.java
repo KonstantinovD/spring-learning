@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.*;
 import java.util.List;
 
 @Slf4j
@@ -40,6 +41,7 @@ public class SingerServiceImpl implements SingerService {
         Singer.FIND_ALL_WITH_ALBUM, Singer.class).getResultList();
   }
 
+  @Transactional(readOnly = true)
   @Override
   public Singer findById(Integer id) {
     TypedQuery<Singer> query = em.createNamedQuery(
@@ -66,25 +68,63 @@ public class SingerServiceImpl implements SingerService {
     Singer mergedSinger = em.merge(singer);
     em.remove(mergedSinger);
 
-    log.info("Singer with id: " + singer.getId()
-        + "deleted successfully");
+    log.info(
+        "Singer with id: {} deleted successfully", singer.getId());
   }
 
+  @Transactional(readOnly = true)
   @Override
   public List<Singer> findSingersByNativeQuery() {
     return em.createNativeQuery(
         ALL_SINGER_NATIVE_QUERY, "singerResult").getResultList();
   }
 
+  @Transactional(readOnly = true)
   @Override
   public List<Object[]> findObjectsByNativeQuery() {
     return em.createNativeQuery(ALL_SINGER_NATIVE_QUERY,
         "singerResult2").getResultList();
   }
 
+  @Transactional(readOnly = true)
   @Override
   public List<ReducedSinger> findReducesSingersByNativeQuery() {
     return em.createNativeQuery(REDUCED_SINGER_NATIVE_QUERY,
         "singerResult3").getResultList();
+  }
+
+  @Transactional(readOnly = true)
+  @Override
+  public List<Singer> findByCriteriaQuery(String firstName, String lastName) {
+    log.info("Finding singer for firstName: {} and lastName: {}",
+        firstName, lastName);
+    CriteriaBuilder cb = em.getCriteriaBuilder(); // билдер
+    // создается типизированный запрос
+    CriteriaQuery<Singer> criteriaQuery =
+        cb.createQuery(Singer.class);
+
+    // корневой объект запроса, представляющий интерфейс
+    // Root<Singer>. Этот объект соответствует указанной сущности и
+    // формирует основу для path-выражений в запросе.
+    Root<Singer> singerRoot = criteriaQuery.from(Singer.class);
+    // equal to JPQL 'left join fetch'
+    singerRoot.fetch("albums", JoinType.LEFT);
+    singerRoot.fetch("instruments", JoinType.LEFT);
+    criteriaQuery.select(singerRoot).distinct(true);
+
+    Predicate resultPredicate = cb.conjunction(); // объединение
+    if (firstName != null) {
+      Predicate predicateFirstName =
+          cb.equal(singerRoot.get("firstName"), firstName);
+      resultPredicate = cb.and(resultPredicate, predicateFirstName);
+    }
+    if (lastName != null) {
+      Predicate predicateLastName =
+          cb.equal(singerRoot.get("lastName"), lastName);
+      resultPredicate = cb.and(resultPredicate, predicateLastName);
+    }
+    criteriaQuery.where(resultPredicate);
+
+    return em.createQuery(criteriaQuery).getResultList();
   }
 }

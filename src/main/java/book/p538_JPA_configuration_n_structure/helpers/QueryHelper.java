@@ -21,8 +21,11 @@ public class QueryHelper {
 
   public void createUpdateDelete() {
     Singer s = insert();
+    EntityPrinterUtils.printSeparator();
     s = update(s);
+    EntityPrinterUtils.printSeparator();
     delete(s);
+    EntityPrinterUtils.printSeparator();
   }
 
   public void checkNativeQuery() {
@@ -31,6 +34,7 @@ public class QueryHelper {
     for (Singer s : singersList) {
       log.info(s.toString());
     }
+    EntityPrinterUtils.printSeparator();
 
     log.info("--- Test native query - SqlResultSetMapping");
     List<Object[]> objectArrays =
@@ -39,6 +43,7 @@ public class QueryHelper {
       log.info(objArray[0].toString());
       log.info("Id: {}, Name: {}", objArray[1], objArray[2]);
     }
+    EntityPrinterUtils.printSeparator();
 
     log.info("--- Test native query - ReducedSinger SqlResultSetMapping");
     List<ReducedSinger> reducedSingers =
@@ -46,6 +51,14 @@ public class QueryHelper {
     for (ReducedSinger reduced : reducedSingers) {
       log.info(reduced.toString());
     }
+    EntityPrinterUtils.printSeparator();
+  }
+
+  public void runCriteriaQuery() {
+    runCriteriaQuery("Eric", "Clapton");
+    EntityPrinterUtils.printSeparator();
+    runCriteriaQuery(null, "Mayer");
+    EntityPrinterUtils.printSeparator();
   }
 
   public Singer insert() {
@@ -110,6 +123,16 @@ public class QueryHelper {
 
   public void delete(Singer singer) {
     singerService.delete(singer);
+  }
+
+  private void runCriteriaQuery(String fn, String ln) {
+    log.info("--- Test criteria query - firstName {}, lastName {}",
+        fn, ln);
+    List<Singer> singersList =
+        singerService.findByCriteriaQuery(fn, ln);
+    for (Singer s : singersList) {
+      EntityPrinterUtils.showFetchSingerInfo(s);
+    }
   }
 
 }

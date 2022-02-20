@@ -22,4 +22,8 @@ public class EntityPrinterUtils {
     }
   }
 
+  public static void printSeparator() {
+    log.info("--------------------------------");
+  }
+
 }

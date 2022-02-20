@@ -14,4 +14,5 @@ public interface SingerService {
   List<Singer> findSingersByNativeQuery();
   List<Object[]> findObjectsByNativeQuery();
   List<ReducedSinger> findReducesSingersByNativeQuery();
+  List<Singer> findByCriteriaQuery(String firstName, String lastName);
 }
