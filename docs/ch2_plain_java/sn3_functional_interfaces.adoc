@@ -1,0 +1,113 @@
+== Функциональные интерфейсы
+
+- Определение функционального интерфейса
+- Основные функциональные интерфейсы
+
+В JDK8 вместе с самой лямбдами было добавлено некоторое количество встроенных *_функциональных интерфейсов_*, которые мы можем использовать, например, в качестве агрументов функций либо в _Stream API_. Они находятся в пакете *_java.util.function_*.
+
+=== Определение функционального интерфейса
+
+_Функциональный интерфейс_ — это интерфейс, который содержит *_ровно один абстрактный метод_*. При этом в функциональном интерфейсе может быть сколько угодно static/default методов.
+
+Когда _параметром метода_ является функциональный интерфейс, передаваемая лямбда должна удовлетворять следующему условию: ее сигнатура должна совпадать с сигнатурой единственного абстрактного метода функционального интерфейса.
+
+Пример функционального интерфейса:
+[source, java]
+----
+@FunctionalInterface
+public interface ToIntBiFunction<T, U> {
+
+   /**
+    * Applies this function to the given arguments.
+    *
+    * @param t the first function argument
+    * @param u the second function argument
+    * @return the function result
+    */
+   int applyAsInt(T t, U u);
+}
+----
+В Java есть несколько готовых функциональных интерфейсов с разным числом и типами входных-выходных параметров (как и приведенный *_ToIntBiFunction_*) Можно создать кастомный функциональный интерфейс, используя аннотацию *_@FunctionalInterface_*. Увидев её, компилятор проверит, что интерфейс и правда является функциональным.
+
+Для функционального интерфейса *_ToIntBiFunction<T, U>_* валиден код, который:
+
+- принимает на вход два параметра (T t, U u). T и U указывают на то, что аргументы могут быть разных типов. Например, Long и String.
+- возвращает значение типа int.
+
+Например, такая лямбда будет удовлетворять этому интерфейсу:
+[source, java]
+----
+(a, b) -> a+b
+----
+
+*_See_* example of custom functional interface in _ch2_plain_java/sn3_functional_interfaces/TripleFunction.java_
+
+=== Основные функциональные интерфейсы
+
+Рассмотрим основные из этих интерфейсов:
+
+- *_Predicate<T>_* +
+Проверяет соблюдение некоторого условия. Если оно соблюдается, то возвращается значение true. В качестве параметра лямбда-выражение принимает объект типа T:
+----
+public interface Predicate<T> {
+  boolean test(T t);
+}
+
+Predicate<Integer> isPositive = x -> x > 0;
+System.out.println(isPositive.test(5)); // true
+----
+- *_Consumer<T>_* +
+Выполняет некоторое действие над объектом типа T, при этом ничего не возвращая:
+----
+public interface Consumer<T> {
+    void accept(T t);
+}
+
+Consumer<Integer> printer = x-> System.out.printf("%d монет", x);
+printer.accept(5) // 5 монет
+----
+- *_Function<T, R>_* +
+Представляет функцию перехода от объекта типа T к объекту типа R:
+----
+public interface Function<T, R> {
+    R apply(T t);
+}
+
+Function<Integer, String> convert = x-> String.valueOf(x) + " монет";
+System.out.println(convert.apply(600)); // 600 монет
+----
+- *_Supplier<T>_* +
+Не принимает никаких аргументов, но должен возвращать объект типа T:
+----
+public interface Supplier<T> {
+    T get();
+}
+
+Supplier<User> userFactory = () -> {
+    Scanner in = new Scanner(System.in);
+    System.out.println("Введите имя: ");
+    String name = in.nextLine();
+    return new User(name);
+};
+----
+- *_UnaryOperator<T>_* +
+Принимает в качестве параметра объект типа T, выполняет над ними операции и возвращает результат операций в виде объекта типа T:
+----
+public interface UnaryOperator<T> {
+    T apply(T t);
+}
+
+UnaryOperator<Integer> square = x -> x*x;
+System.out.println(square.apply(5)); // 25
+----
+- *_BinaryOperator<T>_* +
+Принимает в качестве параметра два объекта типа T, выполняет над ними бинарную операцию и возвращает ее результат также в виде объекта типа T:
+----
+public interface BinaryOperator<T> {
+    T apply(T t1, T t2);
+}
+
+BinaryOperator<Integer> multiply = (x, y) -> x*y;
+System.out.println(multiply.apply(3, 5)); // 15
+----
+
