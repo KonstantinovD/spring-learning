@@ -46,7 +46,7 @@ public class Singer implements Serializable {
 
   @EqualsAndHashCode.Exclude
   @ToString.Exclude
-  @ManyToMany(cascade = { CascadeType.ALL })
+  @ManyToMany
   @JoinTable(name = "singer_instrument",
       joinColumns = @JoinColumn(name = "singer_id"),
       inverseJoinColumns = @JoinColumn(name = "instrument_id"))

@@ -20,7 +20,7 @@ public class Instrument implements Serializable {
 
   @EqualsAndHashCode.Exclude
   @ToString.Exclude
-  @ManyToMany(cascade = { CascadeType.ALL })
+  @ManyToMany
   @JoinTable(name = "singer_instrument",
       joinColumns = @JoinColumn(name = "instrument_id"),
       inverseJoinColumns = @JoinColumn(name = "singer_id"))

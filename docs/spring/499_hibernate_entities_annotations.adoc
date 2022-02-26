@@ -36,7 +36,7 @@
 
 Для реализации такой связи над полем _instruments_ класса _Singer_ требуются две аннотации:
 
-1. *_@ManyToMany(cascade = { CascadeType.ALL })_* для указания many-to-many связи и настройке каскадности (при действиях над *_id_* entity Singer).
+1. *_@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE,CascadeType.DETACH})_* для указания many-to-many связи и настройке каскадности (при действиях над *_id_* entity Singer). ВАЖНО! Нельзя использовать *_CascadeType.DELETE_* и *_CascadeType.ALL_* (т.к. включает в себя все типы каскадности, в т.ч. и DELETE) над _@ManyToMany_, иначе при удалении певца вы удалите и все связанные с ним инструменты. Подробнее см по link:https://thorben-janssen.com/avoid-cascadetype-delete-many-assocations/[ссылке].
 2. Совместно с ней используется аннотация *_@JoinTable_* для указания промежуточной таблицы для соединения, которую должна искать библиотека Hibernate.
 - Атрибут *_name_* задает имя промежуточной таблицы.
 - В атрибуте *_joinColumns_* определяется столбец внешнего ключа для текущей entity (Singer), а в атрибуте *_inverseJoinColumns_* указывается столбец с внешним ключом для таблицы Instrument на другой стороне устанавливаемой связи.
