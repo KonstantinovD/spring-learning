@@ -126,4 +126,7 @@ public class LastChanceHandler implements Thread.UncaughtExceptionHandler {
     }
 }
 ----
+- 27. ForkJoinPool vs ExecutorService:
+1. Fork-join allows you to easily execute divide and conquer jobs, which have to be implemented manually if you want to execute it in ExecutorService.
+2. In practice ExecutorService is usually used to process many independent requests (aka transaction) concurrently, and fork-join when you want to accelerate one coherent job.
 
