@@ -7,7 +7,7 @@ We're going to show how to inject Java collections using the Spring framework. S
 
 ==== List With @Autowired
 
-*_See_* _p131_injecting_collections/CollectionsBean.java_, _p131_injecting_collections/CollectionConfig.java_
+*_See_* _p131_injecting_collections/autowire_collection/CollectionsBean.java_, _p131_injecting_collections/autowire_collection/CollectionConfig.java_
 
 Here, we declared the *_nameList_* property to hold a List of String values. In this example, we use field injection for nameList. Therefore, we put the @Autowired annotation.
 
@@ -15,34 +15,34 @@ After, we register the CollectionsBean in the configuration setup class
 
 ==== Set With Constructor Injection
 
-*_See_* _p131_injecting_collections/SetBean.java_, _p131_injecting_collections/SetConfig.java_
+*_See_* _p131_injecting_collections/set_bean/SetBean.java_, _p131_injecting_collections/set_bean/SetConfig.java_
 
 This time we want to use a constructor injection for initializing the nameSet property
 
 ==== Map With Setter Injection
 
-*_See_* _p131_injecting_collections/MapBean.java_, _p131_injecting_collections/MapConfig.java_
+*_See_* _p131_injecting_collections/map_bean/MapBean.java_, _p131_injecting_collections/map_bean/MapConfig.java_
 
-This time we have a setter method in order to use a setter dependency injection
+This time we have a setter method in order to use a *_setter dependency injection_*
 
 We use @Component to provide MapBean bean
 
 ==== Injecting Bean References
 
-*_See_* _p131_injecting_collections/BaeldungBean.java_, _p131_injecting_collections/BaeldungCollectionBean.java_, _p131_injecting_collections/BaeldungBeanConfig.java_
+*_See_* _p131_injecting_collections/BaeldungBean.java_, _p131_injecting_collections/multiple_beans/BaeldungCollectionBean.java_, _p131_injecting_collections/multiple_beans/BaeldungBeanConfig.java_
 
 We add the Java configuration factory methods for each BaeldungBean element. The Spring container injects the individual beans of the BaeldungBean type into one collection.
 
 ==== Using @Order to Sort Beans
 
-*_See_* _p131_injecting_collections/BaeldungBeanOrderConfig.java_
+*_See_* _p131_injecting_collections/multiple_ordered_beans/BaeldungBeanOrderConfig.java_, _p131_injecting_collections/multiple_ordered_beans/BaeldungCollectionBean.java_
 
 We can specify the order of the beans while injecting into the collection.
 
-For that purpose, we use the @Order annotation and specify the index:
+For that purpose, we use the @Order annotation and specify the index
 
 ==== Using @Qualifier to Select Beans
 
-*_See_* _p131_injecting_collections/BaeldungBeanQualifierConfig.java_, _p131_injecting_collections/BaeldungQualifierCollectionBean.java_
+*_See_* _p131_injecting_collections/multiple_qualified_beans/BaeldungBeanQualifierConfig.java_, _p131_injecting_collections/multiple_qualified_beans/BaeldungQualifierCollectionBean.java_
 
 We can use the @Qualifier to select the beans to be injected into the specific collection that matches the @Qualifier name.

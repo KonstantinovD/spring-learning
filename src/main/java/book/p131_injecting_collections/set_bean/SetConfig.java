@@ -1,4 +1,4 @@
-package book.p131_injecting_collections;
+package book.p131_injecting_collections.set_bean;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

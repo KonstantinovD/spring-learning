@@ -1,4 +1,4 @@
-package book.p131_injecting_collections;
+package book.p131_injecting_collections.set_bean;
 
 import java.util.Set;
 

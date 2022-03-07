@@ -1,5 +1,6 @@
-package book.p131_injecting_collections;
+package book.p131_injecting_collections.multiple_qualified_beans;
 
+import book.p131_injecting_collections.BaeldungBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package book.p131_injecting_collections;
+package book.p131_injecting_collections.map_bean;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

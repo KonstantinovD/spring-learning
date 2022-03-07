@@ -1,4 +1,4 @@
-package book.p131_injecting_collections;
+package book.p131_injecting_collections.autowire_collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 

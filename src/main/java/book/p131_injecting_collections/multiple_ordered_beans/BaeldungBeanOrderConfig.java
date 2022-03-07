@@ -1,5 +1,6 @@
-package book.p131_injecting_collections;
+package book.p131_injecting_collections.multiple_ordered_beans;
 
+import book.p131_injecting_collections.BaeldungBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -8,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 
 @Configuration
-@ComponentScan(basePackages = "book.p131_injecting_collections")
+@ComponentScan(basePackages = "book.p131_injecting_collections.multiple_ordered_beans")
 public class BaeldungBeanOrderConfig {
 
   @Bean

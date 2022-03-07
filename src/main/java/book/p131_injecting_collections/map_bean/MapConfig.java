@@ -1,4 +1,4 @@
-package book.p131_injecting_collections;
+package book.p131_injecting_collections.map_bean;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -10,13 +10,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-@ComponentScan(basePackages = "book.p131_injecting_collections")
+@ComponentScan(basePackages = "book.p131_injecting_collections.map_bean")
 public class MapConfig {
 
-//  @Bean
-//  public MapBean mapBean() {
-//    return new MapBean()
-//  }
+// MapBean - @Component
 
   @Bean
   public Map<Integer, String> nameMap() {
