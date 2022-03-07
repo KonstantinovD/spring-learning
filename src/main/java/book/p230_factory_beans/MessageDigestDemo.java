@@ -33,29 +33,29 @@ public class MessageDigestDemo {
       messageDigester.setDigest2(factoryBeanTwo().getObject());
       return messageDigester;
     }
+  }
 
-    public static void main(String[] args) {
-      GenericApplicationContext ctx =
-          new AnnotationConfigApplicationContext(
-              MessageDigestConfig.class);
-      MessageDigester digester = ctx.getBean(MessageDigester.class);
-      digester.digest("Hello world!");
+  public static void main(String[] args) {
+    GenericApplicationContext ctx =
+        new AnnotationConfigApplicationContext(
+            MessageDigestConfig.class);
+    MessageDigester digester = ctx.getBean(MessageDigester.class);
+    digester.digest("Hello world!");
 
-      // Непосредственный доступ к фабрике компонентов Spring Beans
-      // применяется в нескольких местах исходного кода Spring, но в
-      // приложении его лучше так не применять. Интерфейс FactoryBean
-      // - часть инфраструктуры IoC.
-      MessageDigestFactoryBean factoryBean =
-          (MessageDigestFactoryBean)
-              ctx.getBean("&factoryBeanOne");
-      try {
-        System.out.println(factoryBean
-            .getObject().digest("Factory received".getBytes()));
-      } catch (Exception ex) {
-        ex.printStackTrace();
-      }
-
-      ctx.close();
+    // Непосредственный доступ к фабрике компонентов Spring Beans
+    // применяется в нескольких местах исходного кода Spring, но в
+    // приложении его лучше так не применять. Интерфейс FactoryBean
+    // - часть инфраструктуры IoC.
+    MessageDigestFactoryBean factoryBean =
+        (MessageDigestFactoryBean)
+            ctx.getBean("&factoryBeanOne");
+    try {
+      System.out.println(factoryBean
+          .getObject().digest("Factory received".getBytes()));
+    } catch (Exception ex) {
+      ex.printStackTrace();
     }
+
+    ctx.close();
   }
 }
