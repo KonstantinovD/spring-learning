@@ -3,6 +3,9 @@
 (IoC = Inversion of control) +
 (also see https://www.baeldung.com/spring-dependency-injection)
 
+*_Inversion of Control_* is a principle in software engineering which transfers the control of objects or portions of a program to a *_container_* or *_framework_*. We most often use it in the context of OOP. +
+In contrast with traditional programming, in which our custom code makes calls to a library, *_IoC_* enables a framework to _take control of the flow of a program_ and make calls to our custom code. To enable this, frameworks use abstractions with additional behavior built in. If we want to add our own behavior, we need to extend the classes of the framework or plugin our own classes.
+
 Ядро реализации каркаса Spriпg основано на внедрения зависимостей, хотя в нем обеспечиваются также возможности для поиска зависимостей. Каркас Spriпg автоматически предоставляет взаимодействующие объекты зависимому объекту, используя внедрение зависимостей. *_Механизм внедрения зависимостей_* в Spriпg можно изобразить так:
 
 image::img/DI_schema.jpg[]
