@@ -1,5 +1,11 @@
 === Объектно-реляционное преобразование с помощью аннотаций Hibernate
 
+- Простые преобразования
+- Связи "one-to-many"
+- Связи "many-to-many"
+- CascadeTypes
+
+
 ==== Простые преобразования
 
 *_See_* _p490_start_with_hibernate/entity/..._
@@ -44,3 +50,13 @@
 *_See_* _p490_start_with_hibernate/entity/Instrument.java_
 
 В класса Instrument дополнительно реализована другая сторона рассматриваемого здесь отношения (значения аттрибутов joinColumns и inverseJoinColumns поменялись местами).
+
+=== CascadeTypes
+
+Есть несколько типов каскадных операций (*_See_* link:https://www.baeldung.com/jpa-cascade-types[jpa-cascade-types], link:https://sysout.ru/tipy-cascade-primer-na-hibernate-i-spring-boot/[rus tutorial]):
+
+- CascadeType.PERSIST - при добавлении парента добавляются чайлды.
+- CascadeType.MERGE - при обновлении парента обновляются чайлды.
+- CascadeType.REMOVE - при удалении самого парента удаляются чайлды.
+- CascadeType.REFRESH - при перезагрузки парента из базы перезагружаются чайлды.
+- CascadeType.DETACH - при убирании парента из EntityManager убираются и чайлды.
