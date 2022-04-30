@@ -1,0 +1,17 @@
+== Scopes in @Configuration class beans
+
+Можно задать скоуп функциям, аннотированным как @Bean:
+[source, java]
+----
+@Configuration
+public class FoodConfig {
+
+  // можно задать кастомный скоуп
+  @Bean
+  @Scope("prototype")
+  FoodProviderService foodProviderService() {
+    return new FoodProviderServiceImpl();
+  }
+}
+----
+Кстати, сам класс *@Configuration* - надстройка над *@Component*, т е он имеет скоуп _singleton_.
