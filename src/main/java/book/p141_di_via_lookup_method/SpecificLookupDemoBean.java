@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 @Component("specificLookupBean")
 public class SpecificLookupDemoBean implements DemoBean {
 
+  // В этом случае prototype будет пересоздаваться каждый раз при запросе Singer
+  // через метод getMySinger
   @Lookup("singer")
   public Singer getMySinger() {
     return null; // переопределяется автоматически

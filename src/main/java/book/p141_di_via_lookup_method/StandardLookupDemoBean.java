@@ -9,6 +9,9 @@ public class StandardLookupDemoBean implements DemoBean {
 
   private Singer mySinger;
 
+  // В этом случае prototype будет создан один раз и никогда не обновляться,
+  // т е весь свой жизненный цикл StandardLookupDemoBean будет юзать
+  // один и тот же экземпляр Singer
   @Resource(name = "singer")
   public void setMySinger(Singer mySinger) {
     this.mySinger = mySinger;
