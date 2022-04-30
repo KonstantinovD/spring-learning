@@ -43,3 +43,4 @@
 |Scopes a single bean definition to the lifecycle of a WebSocket. Only valid in the context of a web-aware Spring ApplicationContext.
 |===
 
+*_See_* also: link:https://stackoverflow.com/questions/3001114/using-a-session-scoped-bean[stackoverflow]
