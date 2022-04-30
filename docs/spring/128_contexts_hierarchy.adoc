@@ -7,3 +7,18 @@
 В файле конфигурации порожденного контекста типа ApplicationContext ссылка на какой-нибудь компонент Spring Bean из родительского контекста типа ApplicationContext действует таким же образом, как и ссылка на компонент Spring Bean из порожденного контекста типа ApplicationContext, если только в порожденном контексте данного типа не присутствует компонент Spring Bean с тем же самым именем. В таком случае необходимо просто заменить атрибут bean в дескрипторе <ref> атрибутом parent.
 
 В компоненте songЗ дескриптор разметки <ref> служит для ссылки на компонент childTi tle непосредственно из родительского контекста типа Application Context. Но поскольку в этом компоненте применяется атрибут parent из дескриптора разметки <ref>, то экземпляр компонента childTi tle, объявленный в порожденном контексте типа ApplicationContext, полностью игнорируется. Смотри _p128_contexts_hierarchy/child.xml_
+
+Snippet (child.xml):
+[source, xml]
+----
+    <!--
+Если в дочернем контексте присутствует компонент Spring Bean с тем же
+самым именем [childTitle], то необходимо просто заменить атрибут bean
+в дескрипторе <ref> атрибутом parent.
+    -->
+<bean id="song3" class="book.p128_contexts_hierarchy.Song">
+  <property name="title">
+    <ref parent="childTitle"/>
+  </property>
+</bean>
+----

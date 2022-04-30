@@ -8,7 +8,11 @@
 
     <bean id="childTitle"
           class="java.lang.String" c:_0="No Such Thing"/>
-
+    <!--
+    "childTitle" есть и в паренте, но т к он располагается непосредственно в чайлде,
+    то чайлдовое значение "childTitle" приоритетнее.
+    Ниже будет показано, как сделать приоритетным родительское значение
+    -->
     <bean id="song1" class="book.p128_contexts_hierarchy.Song"
           p:title-ref="parentTitle"/>
     <bean id="song2" class="book.p128_contexts_hierarchy.Song"
