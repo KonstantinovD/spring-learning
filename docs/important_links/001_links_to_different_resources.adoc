@@ -11,6 +11,8 @@ link:https://inponomarev.github.io/java-mipt/slides05/#/_комбинирова�
 - Partition(db). link:https://en.m.wikipedia.org/wiki/Partition_(database)[]
 - Jpa-rest link:http://spring-projects.ru/guides/accessing-data-rest/[]
 - Кеширование в hibernate link:https://easyjava.ru/data/hibernate/keshirovanie-v-hibernate/[] и https://habr.com/ru/post/135176/[]
+- Persistence context в Hibernate +
+link:http://akorsa.ru/2016/07/rukovodstvo-dlya-nachinayushhih-po-perehody-mezhdu-sostoyaniyami-v-jpa-hibernate/[] and link:https://easyjava.ru/data/jpa/jpa-entitymanager-upravlyaem-sushhnostyami/[]
 - Optimism/pessimistic blocks link:https://habr.com/ru/post/268903/[] (hibernate), and link:https://intellect.icu/blokirovka-subd-pessimisticheskaya-optimisticheskaya-sovmestnaya-isklyuchitelnaya-strochnaya-granulyarnaya-4723[]
 - Java study (вопросы и ответы, см spring-learning)  link:https://javastudy.ru/category/interview/page/3/[]
 - Immutable object link:https://www.baeldung.com/java-immutable-object[]
