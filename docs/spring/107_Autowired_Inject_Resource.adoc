@@ -37,3 +37,37 @@ Link to baending collections injection guide: link:https://www.baeldung.com/spri
 ==== When use @Resource and @Autowired
 
 if you intend to express annotation-driven injection by name, do not primarily use *_@Autowired_* - even if is technically capable of referring to a bean name through *_@Qualifier_* values. Instead, prefer the JSR-250 *_@Resource_* annotation which is semantically defined to identify a specific target component by its unique name, with the declared type being irrelevant for the matching process.
+
+Есть еще один интересный момент (который обычно никем не испольуется): +
+*_@Qualifier_* не поддерживает динамический резолвинг bean-имени (если вдруг вы его конфигурите из пропертей), поскольку @Qualifier не поддерживает placeholder. Это можно сделать только с помощью *_@Resource_*:
+[source, java]
+----
+@Resource(name="${service.name}")
+Parent object;
+----
+Где service.name устанавливается в файле свойств как:
+[source, properties]
+----
+#service.name=actualService
+service.name=stubbedService
+----
+
+Почему это бесполезная особенность? Дело в том, что вы в этом случае можете использовать @ConditionalOnProperty:
+[source, java]
+----
+  @ConditionalOnProperty(
+    prefix = "spring.aop",
+    name = {"proxy-target-class"},
+    havingValue = "true",
+    matchIfMissing = true
+  )
+----
+
+Или даже так, через boolean пропертю:
+[source, java]
+----
+@Component
+@ConditionalOnProperty(
+  value = {"ha.enabled"},
+  matchIfMissing = false)
+----
