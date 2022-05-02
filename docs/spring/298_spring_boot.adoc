@@ -2,7 +2,7 @@
 
 Вкратце: работа под капотом с помощью @SpringBootApplication:
 
-*_@SpringBootApplication_* содержит *_@EnableAutoConfiguration_*, которая загружает класс *_AutoConfigurationImportSelector_*. И уже этот класс идет в *_spring-boot-autoconfigure/META-INF/spring.factories_*, откуда достает >100 (>130 in Spring 5) названий классов конфигураций. Каждый класс автоконфигурации (e. g. _org.springframework.boot.autoconfigure.aop.AopAutoConfiguration_) может грузить (или не грузить, чтобы память не грузить/время запуска не увеличивать) бины, используя аннотацию *_@ConditionalOnProperty_*. +
+*_@SpringBootApplication_* содержит *_@EnableAutoConfiguration_*, которая загружает класс *_AutoConfigurationImportSelector_*. И уже этот класс идет в *_spring-boot-autoconfigure/META-INF/spring.factories_*, откуда достает >100 (>130 in Spring 5) названий классов конфигураций. Каждый класс автоконфигурации (e. g. _org.springframework.boot.autoconfigure.aop.AopAutoConfiguration_) может грузить (или не грузить, чтобы память не грузить/время запуска не увеличивать) бины, используя аннотации *_@ConditionalOnProperty_*, *_@ConditionalOnClass_* и пр. +
 *_!!! IMPORTANT !!!_* *_See_* link:https://habr.com/ru/post/334448/[HABR]
 
 Другие полезные ссылки:
