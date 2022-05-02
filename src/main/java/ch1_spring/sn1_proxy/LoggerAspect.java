@@ -28,6 +28,8 @@ public class LoggerAspect {
     try {
       return joinPoint.proceed();
     } finally {
+      // после любой (в том числе Exception) обработки оригинального Pojo-метода,
+      // мы можем вставить постобработку сюда
       stopWatch.stop();
       System.out.println("Execution time for " + className + "." + methodName + " :: " + stopWatch.getTotalTimeMillis() + " ms");
     }
