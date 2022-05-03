@@ -1,7 +1,12 @@
 == Транзакции
 
 См. также link:https://medium.com/@kirill.sereda/%D1%82%D1%80%D0%B0%D0%BD%D0%B7%D0%B0%D0%BA%D1%86%D0%B8%D0%B8-%D0%B2-spring-framework-a7ec509df6d2[tutorial (rus)] и link:https://www.javainuse.com/spring/transaction-interview[transaction-interview questions] +
-А также link:https://www.javainuse.com/spring/springtrans[Spring Boot Transaction Management Tutorial]
+А также link:https://www.javainuse.com/spring/springtrans[Spring Boot Transaction Management Tutorial] +
+А еще:
+
+- зачем нам *_@Transactional(readOnly = true)_* link:https://stackoverflow.com/questions/44984781/what-are-advantages-of-using-transactionalreadonly-true[stackoverflow]
+- Про transaction propagation: *_@Transactional(propagation = Propagation.REQUIRED)_* link:https://www.javainuse.com/spring/boot-transaction-propagation[boot-transaction-propagation]
+
 
 Транзакции - одна из самых важных составляющих построения надежного корпоративного приложения . Наиболее распространенным типом транзакции является *_операция в базе данных_*. В ходе типичной операции обновления начинается транзакция в базе данных, где данные обновляются, а по результатам выполнения этой операции в базе данных транзакция фиксируется или откатывается. Но зачастую, в зависимости от требований к приложению (СУРБД, ERP), управление транзакциями может оказаться более сложным.
 
