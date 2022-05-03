@@ -1,0 +1,5 @@
+=== Notes 3
+
+- Вы можете использовать SpringData репозитории для доступа к монге: +
+_org.springframework.data.mongodb.repository.*MongoRepository* extends **PagingAndSortingRepository**_
+- CrudRepository/JpaRepository под собой используют в том числе *_CriteriaQueryApi_*.
