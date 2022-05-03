@@ -1,0 +1,16 @@
+=== Notes 2
+
+- Шпаргалка Java программиста 1: JPA и Hibernate в вопросах и ответах: +
+link:https://habr.com/ru/post/265061/[habr]
+- @MappedSuperclass - наследование классов через Hibernate: +
+link:https://javascopes.com/how-to-inherit-properties-from-a-base-class-entity-using-mappedsuperclass-with-jpa-and-hibernate-669ce64a/[javascopes.com]
+- Что такое *_top-level class_*? +
+A top level class is a class that is NOT a nested class. A nested class is any class whose declaration occurs within the body of another class or interface.
+- Hibernate - *_@Access_*, AccessType.*_FIELD_*/AccessType.*_PROPERTY_*. Во втором случае аннотируются не поля класса, а *_геттеры_* (полей или просто так): +
+link:https://ru.stackoverflow.com/questions/874276/%D0%94%D0%BB%D1%8F-%D1%87%D0%B5%D0%B3%D0%BE-accesstype-field-%D0%B8-accesstype-property-%D0%B2-access[stackoverflow]
+- JPA @Embedded And @Embeddable классы: +
+link:https://www.baeldung.com/jpa-embedded-embeddable[baeldung]
+- *_Hibernate Session_* - what is it? +
+Session — однопоточный короткоживущий объект, который предоставляет связь между объектами приложения и базой данных. Он оборачивает JDBC _java.sql.Connection_ и работает как фабрика для _org.hibernate.Transaction_. +
+Разработчик должен открывать сессию по необходимости и закрывать ее сразу после использования. Экземпляр Session является интерфейсом между кодом в java приложении и hibernate framework и предоставляет методы для операций CRUD. +
+*_See_*: link:https://proselyte.net/tutorials/hibernate-tutorial/sessions/[proselyte.net]
