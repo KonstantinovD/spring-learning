@@ -21,7 +21,7 @@ import java.util.Set;
             + "left join fetch s.albums a "
             + "left join fetch s.instruments i "
             + "where s.id = :id"),
-    @NamedQuery(name = Singer.FIND_ALL_WITH_ALBUM,
+    @NamedQuery(name = Singer.FIND_ALL_WITH_ALBUM_AND_INSTRUMENT,
         query = "select distinct s from Singer s " +
             "left join fetch s.albums a " +
             "left join fetch s.instruments i")
@@ -47,7 +47,7 @@ public class Singer implements Serializable {
 
   public static final String FIND_ALL = "Singer.findAll";
   public static final String FIND_SINGER_BY_ID = "Singer.findById";
-  public static final String FIND_ALL_WITH_ALBUM =
+  public static final String FIND_ALL_WITH_ALBUM_AND_INSTRUMENT =
       "Singer.findAllWithAlbum";
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

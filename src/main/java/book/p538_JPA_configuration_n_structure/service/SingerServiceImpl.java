@@ -38,7 +38,7 @@ public class SingerServiceImpl implements SingerService {
   @Override
   public List<Singer> listSingersWithAlbumAndInstrument() {
     return em.createNamedQuery(
-        Singer.FIND_ALL_WITH_ALBUM, Singer.class).getResultList();
+        Singer.FIND_ALL_WITH_ALBUM_AND_INSTRUMENT, Singer.class).getResultList();
   }
 
   @Transactional(readOnly = true)
