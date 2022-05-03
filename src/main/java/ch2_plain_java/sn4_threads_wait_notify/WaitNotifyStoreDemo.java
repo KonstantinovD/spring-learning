@@ -19,18 +19,8 @@ public class WaitNotifyStoreDemo {
 // Класс Магазин, хранящий произведенные товары
 class Store{
   private int product=0;
-  private Lock locker;
-  private Lock locker2;
-  private Condition productState;
-  private Condition productState2;
 
-  public Store(){
-    locker = new ReentrantLock();
-    productState = locker.newCondition();
-
-    locker2 = new ReentrantLock();
-    productState2 = locker.newCondition();
-  }
+  public Store() { }
 
   public synchronized void get() {
     while (product < 1) {
