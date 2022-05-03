@@ -30,7 +30,6 @@ public class LockWithConditionsStackDemo {
     }).start();
     new Thread(() -> {
       for (int i = 1; i < 6; i++) {
-        int val = i;
         new Thread(() ->
         {
           try {

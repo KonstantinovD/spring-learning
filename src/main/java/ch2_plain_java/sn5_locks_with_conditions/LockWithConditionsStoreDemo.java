@@ -20,9 +20,9 @@ public class LockWithConditionsStoreDemo {
 // Класс Магазин, хранящий произведенные товары
 class Store{
   private int product=0;
-  private Lock locker;
-  private Condition productState;
-  private Condition productState2;
+  private final Lock locker;
+  private final Condition productState;
+  private final Condition productState2;
 
   public Store(){
     locker = new ReentrantLock();
@@ -30,7 +30,7 @@ class Store{
     productState2 = locker.newCondition();
   }
 
-  public synchronized void get() {
+  public void get() {
     try {
       locker.lock(); // potentially deadlock
       while (product < 1) {
@@ -51,7 +51,7 @@ class Store{
       locker.unlock();
     }
   }
-  public synchronized void put() {
+  public void put() {
     try {
       locker.lock(); // potentially deadlock
       while(product >= 3) {
@@ -72,7 +72,7 @@ class Store{
     }
   }
 
-  private synchronized int operateProduct(int delta) {
+  private int operateProduct(int delta) {
     product += delta;
     return product;
   }
