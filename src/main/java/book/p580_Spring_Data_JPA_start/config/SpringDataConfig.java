@@ -21,7 +21,10 @@ import java.util.Properties;
 
 @Slf4j
 @Configuration
-@EnableTransactionManagement
+@EnableTransactionManagement // нам нужен TransactionManager,
+// мы прописываем бин в конфигурации и он связывается с помощью этой анноташки,
+// (see JpaConfig.transactionManager()).
+// Поэтому нам нужно прописать бин TransactionManager-а
 @EnableJpaRepositories(
     basePackages = "book.p580_Spring_Data_JPA_start")
 public class SpringDataConfig {
@@ -40,5 +43,42 @@ public class SpringDataConfig {
       log.error("Embedded DataSource bean cannot bе created!", ex);
       return null;
     }
+  }
+
+  // нам нужно прописать бин TransactionManager-а
+  @Bean
+  public PlatformTransactionManager transactionManager() {
+    return new JpaTransactionManager(entityManagerFactory());
+  }
+
+  @Bean
+  public EntityManagerFactory entityManagerFactory() {
+    LocalContainerEntityManagerFactoryBean factoryBean =
+        new LocalContainerEntityManagerFactoryBean();
+    factoryBean.setPackagesToScan(
+        "book.p538_JPA_configuration_n_structure");
+    factoryBean.setDataSource(dataSource());
+    factoryBean.setJpaVendorAdapter(jpaVendorAdapter());
+    factoryBean.setJpaProperties(hibernateProperties());
+    factoryBean.afterPropertiesSet();
+    return factoryBean.getNativeEntityManagerFactory();
+  }
+
+  @Bean
+  public JpaVendorAdapter jpaVendorAdapter() {
+    return new HibernateJpaVendorAdapter();
+  }
+
+  private Properties hibernateProperties() {
+    Properties hibernateProp = new Properties();
+    hibernateProp.put("hibernate.dialect",
+        "org.hibernate.dialect.PostgreSQLDialect");
+    hibernateProp.put("hibernate.format_sql", true);
+    hibernateProp.put("hibernate.use_sql_comments", true);
+    hibernateProp.put("hibernate.show_sql", true);
+    hibernateProp.put("hibernate.max_fetch_depth", 3);
+    hibernateProp.put ( "hibernate.jdbc.batch size", 10);
+    hibernateProp.put ("hibernate.jdbc.fetch_size", 50);
+    return hibernateProp;
   }
 }
