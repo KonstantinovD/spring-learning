@@ -3,6 +3,8 @@
 Рассмотрим одну из библиотек
 объектно-реляционного преобразования (ORM) под названием *_Hibernate_*. Среди всех open-source библиотек ORM она является одной из самых удачных.
 
+*_See:_* Шпаргалка Java программиста 1: JPA и Hibernate в вопросах и ответах: link:https://habr.com/ru/post/265061/[]
+
 Распространенность Hiberпate повлияла также на разработку спецификации объектов данных Java (Java Data Object - JDO) в качестве одной из стандартных технологий ORM на платформе Java ЕЕ. В версии EJB 3.0 компонент сущности EJB был даже заменен прикладным интерфейсом *_Java Persisteпce АРI (JPA_*), на многие принципы организации которого оказали влияние такие распространенные библиотеки ORM, как _Hibernate_, _TopLink_ и _JDO_.
 
 Начиная с Hibernate 3.2 предоставляется реализация прикладного интерфейса *_JPA_*. Это означает, что при разработке приложений с помощью библиотеки Hibernate в качестве поставщика услуг сохраняемости данных можно выбирать между собственным прикладным интерфейсом _API библиотеки Hibernate_ и прикладным _JPA АРI с поддержкой Hibernate_.
@@ -54,4 +56,7 @@
 
 |===
 
+==== max_fetch_depth - что это?
 
+Imagine a Person and an Address Entity. Each person lives at one address (very simple system), but many people might live at the same address. In the object model a Person would probably have an address property. This would be mapped as many-to-one (as the doc says). Now when fetching a Person from the database, hibernate encounters this property. In the database it's a column with a foreign key to the Address table. To fetch the associated object, a join to this table can be used. The resulting data would be used to populate an Address object that would be set on the address property on the person. In this sense Hibernate traverses the object graph when fetching an object. +
+Now what if Address had a property City? This would also be many-to-one and would lead to a join by the same logic. What if City had a property Country? Same thing. Doing many joins would be bad for performance. At some point it would be better to do a separate select, get the data from a cache or inject a proxy. This configuration property determines how many associations hibernate will traverse by join when fetching data.
