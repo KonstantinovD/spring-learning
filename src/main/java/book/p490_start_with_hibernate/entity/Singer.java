@@ -28,6 +28,23 @@ public class Singer implements Serializable {
   @Column(name = "id")
   private Integer id;
 
+  // а можно еще и так сделать
+  /*
+    @Id
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator",
+            parameters = {@org.hibernate.annotations.Parameter(
+                    name = "uuid_gen_strategy_class",
+                    value = "org.hibernate.id.uuid.CustomVersionOneStrategy"
+            )
+            }
+    )
+    @Column(name = "generatedId", updatable = false, nullable = false)
+    private UUID generatedId;
+  */
+
   @Column(name = "first_name")
   private String firstName;
 
@@ -41,7 +58,7 @@ public class Singer implements Serializable {
   @EqualsAndHashCode.Exclude
   @ToString.Exclude
   @OneToMany(mappedBy = "singer", cascade = CascadeType.ALL,
-      orphanRemoval = true)
+      orphanRemoval = true, fetch = FetchType.LAZY)
   private Set<Album> albums = new HashSet<>();
 
   @EqualsAndHashCode.Exclude
