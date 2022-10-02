@@ -109,6 +109,9 @@ public class QueryHelper {
         .findFirst();
     singer.getAlbums().remove(album.get());
 
+   --- UPDATED: 28.08.22
+   --- возможно, надо еще сделать "album.get().setSinger(null);"
+
     singer.getAlbums().removeIf(album1 -> album1.equals("A Heart Full of Blues"));
 //    album.get().setSinger(null);
 //    album.ifPresent(value -> singer.getAlbums().remove(value));
