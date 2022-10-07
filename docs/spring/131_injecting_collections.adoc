@@ -3,7 +3,9 @@
 ==== Baeldung guide:
 
 link:https://www.baeldung.com/spring-injecting-collections[link] +
-We're going to show how to inject Java collections using the Spring framework. Simply put, we'll demonstrate examples with the List, Map, Set collection interfaces.
+We're going to show how to inject Java collections using the Spring framework. Simply put, we'll demonstrate examples with the List, Map, Set collection interfaces. +
+Кроме того, там есть ссылка на работу *_@Order_* с *_AspectJ_* - но она не очень. Лучше посмотреть на эту ссыль: link:https://jstobigdata.com/spring/advice-ordering-using-order-in-spring-aop/[jstobigdata] (там три *_@Aspect_* - ZeroAdvice.java, SecondAdvice.java, ThirdAdvice.java)
+
 
 ==== List With @Autowired
 
