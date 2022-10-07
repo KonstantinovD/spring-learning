@@ -43,4 +43,8 @@
 |Scopes a single bean definition to the lifecycle of a WebSocket. Only valid in the context of a web-aware Spring ApplicationContext.
 |===
 
+===== Зачем нужны session-scoped бины?
+
+Ситуация: достаточно большое веб-приложение с применением Spring. Бины в приложении делятся на *session-scoped* (получается per user, бина как правило _с состоянием_) и на *application-wide* (scope - prototype или singleton, без состояния). Session-scoped бины Spring укладывает в сессию (в смысле в HTTP session).
+
 *_See_* also: link:https://stackoverflow.com/questions/3001114/using-a-session-scoped-bean[stackoverflow]
