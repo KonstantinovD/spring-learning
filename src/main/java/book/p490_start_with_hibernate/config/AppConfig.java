@@ -36,7 +36,7 @@ public class AppConfig {
     hibernateProp.put("hibernate.use_sql_comments", true);
     hibernateProp.put("hibernate.show_sql", true);
     hibernateProp.put("hibernate.max_fetch_depth", 3);
-    hibernateProp.put ( "hibernate.jdbc.batch size", 10);
+    hibernateProp.put ( "hibernate.jdbc.batch_size", 10);
     hibernateProp.put ("hibernate.jdbc.fetch_size", 50);
     return hibernateProp;
   }

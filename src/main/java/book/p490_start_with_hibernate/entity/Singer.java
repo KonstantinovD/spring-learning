@@ -44,6 +44,15 @@ public class Singer implements Serializable {
     @Column(name = "generatedId", updatable = false, nullable = false)
     private UUID generatedId;
   */
+  // Или так:
+  /*
+    @Id
+    @GeneratedValue(generator = "uuid_custom_strategy")
+    @GenericGenerator(name = "uuid_custom_strategy",
+            strategy = "main.java... UUIDCustomGenerator")
+
+    где UUIDCustomGenerator extends UUIDGenerator
+  */
 
   @Column(name = "first_name")
   private String firstName;
