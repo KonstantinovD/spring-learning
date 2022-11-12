@@ -1,7 +1,6 @@
 == Инверсия управления в Spring
 
-(IoC = Inversion of control) +
-(also see https://www.baeldung.com/spring-dependency-injection)
+Про инверсию управления см здесь: link:https://habr.com/ru/post/116232/[habr]. Смысл инверсии управления - управление инвертировано — управляют мной, а не я управляю фреймворком.
 
 *_Inversion of Control_* is a principle in software engineering which transfers the control of objects or portions of a program to a *_container_* or *_framework_*. We most often use it in the context of OOP. +
 In contrast with traditional programming, in which our custom code makes calls to a library, *_IoC_* enables a framework to _take control of the flow of a program_ and make calls to our custom code. To enable this, frameworks use abstractions with additional behavior built in. If we want to add our own behavior, we need to extend the classes of the framework or plugin our own classes.
@@ -13,4 +12,4 @@ image::img/DI_schema.jpg[]
 Иногда для доступа к зависимым объектам понадобится и *_поиск зависимостей_*. Во многих средах Spriпg не может автоматически связать все компоненты приложения с помощью внедрения зависимостей, поэтому для доступа к первоначальному набору компонентов придется прибегнуть к поиску зависимостей. +
 Например, в _автономных приложениях на Java_ необходимо выполнить начальную загрузку контейнера Spriпg в методе *_main()_* и получить зависимости через интерфейс *_ApplicationContext_* для программной обработки. Но при построении веб-приложений с подцержкой проектного шаблона MVC в Spriпg этого можно избежать благодаря автоматическому связыванию всего приложения.
 
-Контейнер инверсии управления в Spring примечателен тем, что он может выполнять функцию адаптера между его собственным контейнером внедрения зависимостей и внешними контейнерами поиска зависимостей. Данная функция рассматривается далее в этой главе. В каркасе Spring подцерживается внедрение зависимостей как через конструктор, так и через метод установки.
+Контейнер инверсии управления в Spring примечателен тем, что он может выполнять функцию адаптера между его собственным контейнером внедрения зависимостей и внешними контейнерами поиска зависимостей. Данная функция рассматривается далее в этой главе. В каркасе Spring поддерживается внедрение зависимостей как через конструктор, так и через метод установки.
