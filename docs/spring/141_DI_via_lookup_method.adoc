@@ -8,9 +8,10 @@ link:https://www.baeldung.com/spring-lookup[link] for *_@Lookup_* annotation usa
 ==== Book:
 
 Внедрение зависимостей через метод поиска было введено в версии Spring 1.1 для преодоления затруднений, возникающих в том случае, если один компонент Spring Bean зависит от другого компонента с *_отличающимся жизненным циклом_*, в частности, когда _Singleton_ объект зависит от _Prototype_ объекта. В подобных случаях требуется, чтобы _Singleton_ получал при необходимости новый экземпляр _Prototype_, а не хранил единственный и постоянный экземпляр _Prototype_. Example: link:https://www.baeldung.com/spring-inject-prototype-bean-into-singleton[baeldung]. +
-BTW, we can also use *_@Scope(
-value = ConfigurableBeanFactory.SCOPE_PROTOTYPE,
-proxyMode = ScopedProxyMode.TARGET_CLASS)_* +
+
+BTW мы также можем использовать
+*_@Scope(value = "prototype", proxyMode = ScopedProxyMode.TARGET_CLASS)_* +
+_(кстати, ConfigurableBeanFactory.SCOPE_PROTOTYPE == "prototype")_ +
 Пример *_@Scope_* с параметрами проиллюстрирован ниже: бин имеет скоуп реквест, и при внедрении этого бина в синглтон бин, синглтон по факту получает прокси, в который при каждом запросе сетается новый реальный бин скоупа реквест (also see link:https://www.baeldung.com/spring-bean-scopes#1-request-scope[baeldung]):
 
 [source, java]
