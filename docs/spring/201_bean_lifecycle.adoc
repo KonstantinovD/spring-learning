@@ -50,5 +50,32 @@ image::img/bean_destruction_lifecycle.png[]
 
 Подробнее о разнице: *_See_* link:https://stackoverflow.com/a/30456202[stackoverflow]
 
+Для чего же нужен BeanPostProcessor? Зачастую используется его метод `postProcessAfterInitialization()` для настройки проксей для объекта. Пример: link:https://www.stackchief.com/blog/BeanPostProcessor%20Example%20%7C%20Spring%20Boot[www.stackchief.com] +
+Код из этой статьи:
+[source, java]
+----
+@Component
+public class MyCustomBeanPostProcessor implements BeanPostProcessor {
+    public Object postProcessAfterInitialization(Object bean, String beanName) {
+        if (bean instanceof Person) {
+            ProxyFactory proxyFactory = new ProxyFactory(bean);
+            proxyFactory.addAdvice(new LoggingInterceptor());
+            return proxyFactory.getProxy();
+        }
+        return bean;
+    }
+
+    private static class LoggingInterceptor implements MethodInterceptor {
+        @Override
+        public Object invoke(MethodInvocation methodInvocation) throws Throwable {
+            System.out.println("Before sayHello() method called");
+            Object returnValue = methodInvocation.proceed();
+            System.out.println("After sayHello() method called");
+            return returnValue;
+        }
+    }
+}
+----
+
 По поводу упоминавшегося в статье *_init()_*-метода, он же *@PostConstruct*: +
 На этапе init() метода бин еще не до конца сконфигурирован и поэтому если у бина есть какие-то proxy, аспекты, которые для него что-то делают, этого на этапе _@PostConstruct_ еще не существует. Поэтому нежелательно использовать _@PostConstruct_ для вызова бизнес логики.
