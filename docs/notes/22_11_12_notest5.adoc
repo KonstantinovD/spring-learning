@@ -1,0 +1,3 @@
+=== Notes 5
+
+- Полезный сайт с вопросами к собесам - link:https://itsobes.ru/JavaSobes/tags/mnogopotochnost/[itsobes.ru]
