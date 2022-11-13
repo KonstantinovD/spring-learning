@@ -6,7 +6,7 @@
 [source, java]
 ----
 @OneToMany(fetch = FetchType.LAZY, mappedBy = "author")
-@BatchSize(size = 10)
+@BatchSize(size = 10) //это используется чаще
 private Set<Book> books;
 ----
 
