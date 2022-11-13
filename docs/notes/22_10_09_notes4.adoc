@@ -1,0 +1,4 @@
+=== Notes 4
+
+- Generics - link:https://habr.com/ru/company/sberbank/blog/416413/[habr]
+- Atomics - link:https://itsobes.ru/JavaSobes/kak-ustroeny-atomiki/[itsobes] + link:https://stackoverflow.com/questions/32634280/how-does-compare-and-set-in-atomicinteger-works[stackoverflow]
