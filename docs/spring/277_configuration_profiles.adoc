@@ -5,3 +5,35 @@
 *_See_* _p277_configuration_profiles/..._
 
 Профили в Spring предоставляют возможность *_конфигурирования запуска приложений_*, который обычно реализуется в инструментальных средствах сборки (например, в *_Maven_*, где имеется специальная поддержка профилей). Разработчики приложений могут самостоятельно определять профили и активизировать их программно или с помощью специального параметра виртуальной машины JVM. Благодаря поддержке профилей в Spring можно иметь один архив приложения и развертывать его в самых разных средах, передавая подходящий профиль в качестве аргумента во время начальной загрузки JVM. Приложения могут иметь *_разные профили_*: (_dev_, _hibernate_), (_prd_, _jdbc_) и т.д. В приведенном списке каждая их комбинация представляет среду выполнения (среду разработки или эксплуатации) и применяемую библиотеку доступа к данным (Hibernate или JDBC). Но нужно помнить, что упаковка файлов для всех профилей приводит к *_увеличению размера_* пакета сверх обычного.
+
+Профили также используются при написании тестов, например:
+[source, java]
+----
+@ActiveProfiles({"integration-tests", "dev"})
+@RunWith(SpringRunner.class)
+@Ignore
+public class IntegrationTest {
+
+  .......................
+
+  @TestConfiguration
+  @Profile("integration-tests")
+  public static class IntegrationTestsConfig {
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Bean
+    public ObjectReader requestReader() {
+      return objectMapper.readerFor(TelecomRequest.class);
+    }
+  }
+}
+----
+Либо при написании тестов для аутентификации/конфигов аутентификации (Secure/UnsecureConfig).
+[source, java]
+----
+@Configuration
+@Profile("dev")
+public class InsecureConfig { }
+----
