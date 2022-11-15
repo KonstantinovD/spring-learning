@@ -7,7 +7,7 @@ link:https://javascopes.com/how-to-inherit-properties-from-a-base-class-entity-u
 - Что такое *_top-level class_*? +
 A top level class is a class that is NOT a nested class. A nested class is any class whose declaration occurs within the body of another class or interface.
 - Hibernate - *_@Access_*, AccessType.*_FIELD_*/AccessType.*_PROPERTY_*. Во втором случае аннотируются не поля класса, а *_геттеры_* (полей или просто так): +
-link:https://ru.stackoverflow.com/questions/874276/%D0%94%D0%BB%D1%8F-%D1%87%D0%B5%D0%B3%D0%BE-accesstype-field-%D0%B8-accesstype-property-%D0%B2-access[stackoverflow]
+link:https://ru.stackoverflow.com/questions/874276/%D0%94%D0%BB%D1%8F-%D1%87%D0%B5%D0%B3%D0%BE-accesstype-field-%D0%B8-accesstype-property-%D0%B2-access[rus], link:https://howtodoinjava.com/jpa/field-vs-property-vs-mixed-access-modes-jpa-tutorial/[eng],  link:http://www.java2s.com/example/java-api/javax/persistence/accesstype/property-0.html[examples_of_code]
 - JPA @Embedded And @Embeddable классы: +
 link:https://www.baeldung.com/jpa-embedded-embeddable[baeldung] + link:https://habr.com/ru/post/180703/[habr]
 - *_Hibernate Session_* - what is it? +
