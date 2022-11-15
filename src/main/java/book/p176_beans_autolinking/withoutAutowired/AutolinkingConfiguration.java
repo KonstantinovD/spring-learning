@@ -4,7 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
+//@Configuration - can be replaced by @ComponentScan
+// component scan is necessary, unless we catch "NoSuchBeanDefinitionException: No bean named 'myPlane' available"
 @ComponentScan(basePackages = "book.p176_beans_autolinking.withoutAutowired")
 public class AutolinkingConfiguration {
   @Bean
