@@ -1,5 +1,6 @@
 == JAVA.UTIL.CONCURRENT
-links: link:https://habr.com/ru/company/luxoft/blog/157273/[habr1], link:https://www.baeldung.com/java-util-concurrent[baeldung]
+links: link:https://habr.com/ru/company/luxoft/blog/157273/[habr1], link:https://www.baeldung.com/java-util-concurrent[baeldung] +
+link:https://www.codejava.net/java-core/concurrency/java-concurrent-collection-copyonwritearraylist-examples[about CopyOnWriteArrayList]
 
 - Intro
 - Executor Services
