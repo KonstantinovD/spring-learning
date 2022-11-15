@@ -18,6 +18,8 @@ Example of proxy (NOT WORKING, ClassCastException):
 
 ==== JDK dynamic proxy vs CGLIB proxy
 
+link:https://stackoverflow.com/questions/10664182/what-is-the-difference-between-jdk-dynamic-proxy-and-cglib#:~:text=JDK%20Dynamic%20proxy%20can%20only,No%20need%20for%20interfaces.[stackoverflow]
+
 *_JDK Dynamic proxy_* может проксировать только _используя интерфейс_ (поэтому ваш целевой класс должен имплементировать интерфейс, который также будет имплементирован прокси-классом).
 
 *_CGLIB_* (и *_javassist_* - библиотека для упраления байт-кодом - link:https://habr.com/ru/post/664818/[habr]) может создавать прокси используя наследование. Прокси становится наследником целевого класса, интерыейс здесь не нужен.
@@ -37,8 +39,6 @@ public class Foo
 ==== Прокси в Spring (AOP)
 
 Оригинал: link:https://habr.com/ru/post/597797/[habr]
-
-https://stackoverflow.com/questions/10664182/what-is-the-difference-between-jdk-dynamic-proxy-and-cglib#:~:text=JDK%20Dynamic%20proxy%20can%20only,No%20need%20for%20interfaces.
 
 Прокси в случае Spring - это объект, созданный при помощи *_АОП_* для реализации так называемых аспектных контрактов. Проще говоря, это *_обертка вокруг экземпляра bean_*, которая может использовать функционал оригинального бина, но со своими доработками. Spring использует прокси под капотом для автоматического добавления дополнительного поведения без изменения существующего кода. Это достигается одним из двух способов:
 
