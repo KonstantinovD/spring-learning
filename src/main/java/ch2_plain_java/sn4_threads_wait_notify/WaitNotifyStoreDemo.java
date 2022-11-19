@@ -1,8 +1,12 @@
 package ch2_plain_java.sn4_threads_wait_notify;
 
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+/*
+Чтобы вызывать методы
+wait(), notify(), notifyAll()
+у объекта, необходимо чтобы был захвачен его монитор (т.е. нужно быть внутри
+synchronized-блока на этом объекте).
+В противном случае будет выброшено IllegalMonitorStateException.
+**/
 
 public class WaitNotifyStoreDemo {
 
