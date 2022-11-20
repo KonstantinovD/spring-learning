@@ -127,6 +127,11 @@ public class LastChanceHandler implements Thread.UncaughtExceptionHandler {
 }
 ----
 - 27. ForkJoinPool vs ExecutorService:
-1. Fork-join allows you to easily execute divide and conquer jobs, which have to be implemented manually if you want to execute it in ExecutorService.
+1. Fork-join allows you to easily execute divide and conquer jobs, which have to be implemented manually if you want to execute it in ExecutorService. (также см link:https://itsobes.ru/JavaSobes/chto-takoe-forkjoinpool/[itsobes])
 2. In practice ExecutorService is usually used to process many independent requests (aka transaction) concurrently, and fork-join when you want to accelerate one coherent job.
+3. ForkJoinPool – специальный вид ExecutorService, который предназначен для выполнения рекурсивных задач. Задача для сервиса представляется экземпляром класса ForkJoinTask. В основном используются подклассы _RecursiveTask_ и _RecursiveAction_, для задач с результатом и без соответственно. Аналогично интерфейсам Callable и Runnable обычного ExecutorService. +
+Тело рекурсивной операции задается в реализации метода *_compute()_* задачи ForkJoinTask. Здесь же создаются новые подзадачи, и запускаются параллельно методом *_fork()_*. Чтобы дождаться завершения выполнения задачи, на каждой форкнутой подзадаче вызывается блокирующий метод *_join()_*, результат выполнения при необходимости агрегируется. +
+С точки зрения использования метод ForkJoinTask.join() похож на аналогичный метод класса Thread. Но в случае fork-join поток может на самом деле не заснуть, а переключиться на выполнение другой задачи. Такая стратегия называется work stealing, и позволяет эффективнее использовать ограниченное количество потоков.
+Пример ForkJoinPool с рекурсивными тасками: +
+*_See_* _important_links/sn1_fork_join_pool/..._
 
