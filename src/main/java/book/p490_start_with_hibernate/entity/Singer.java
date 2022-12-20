@@ -52,6 +52,8 @@ public class Singer implements Serializable {
             strategy = "main.java... UUIDCustomGenerator")
 
     где UUIDCustomGenerator extends UUIDGenerator
+
+    также ссылка на статью: https://thorben-janssen.com/generate-uuids-primary-keys-hibernate/
   */
 
   @Column(name = "first_name")
