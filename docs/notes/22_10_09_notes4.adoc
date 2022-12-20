@@ -1,4 +1,13 @@
 === Notes 4
 
-- Generics - link:https://habr.com/ru/company/sberbank/blog/416413/[habr]
+- Generics - link:https://habr.com/ru/company/sberbank/blog/416413/[habr] +
+Также смотри разницу между `Collection<?>` и `Collection<T>` здесь: link:https://docs.oracle.com/javase/specs/jls/se7/html/jls-4.html#jls-4.5.1[docs.oracle] +
+Грубо говоря, в `T` можно подставить любой тип в объявлении функции, класса и пр, и иметь, например:
+[source, java]
+----
+Reference(T referent, ReferenceQueu e<? super T> queue);
+----
+Также *_See_* _ch2_plain_java.sn11_generics/..._ - про множественное ограничение (Multiple bounds) в Generics. +
+И очень полезное видео по generics (в том числе и про Multiple Bounds) - link:https://www.youtube.com/watch?v=_0c9Fd9FacU&t=1204s[youtube]
+
 - Atomics - link:https://itsobes.ru/JavaSobes/kak-ustroeny-atomiki/[itsobes] + link:https://stackoverflow.com/questions/32634280/how-does-compare-and-set-in-atomicinteger-works[stackoverflow]
