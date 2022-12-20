@@ -28,12 +28,6 @@ public class CarDemo {
       return new Car(90, "ZIL-130", true);
     }
 
-    @Bean(initMethod = "init", destroyMethod = "destroyBean")
-    public Car carTwo() {
-      Car car = new Car();
-      car.setGasolineEngine(false);
-      return car;
-    }
 
     @Bean(initMethod = "init", destroyMethod = "destroyBean")
     public Car carThree() {

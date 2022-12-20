@@ -2,9 +2,11 @@ package book.p201_bean_lifecycle_methods;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
@@ -13,7 +15,7 @@ import javax.annotation.PreDestroy;
 @NoArgsConstructor
 @Data
 public class Car implements InitializingBean, BeanNameAware,
-    DisposableBean {
+    DisposableBean, BeanPostProcessor {
 
   public static final int DEFAULT_MAX_SPEED = 150;
 
@@ -33,6 +35,7 @@ public class Car implements InitializingBean, BeanNameAware,
   // THEN  id бина передается в метод setBeanName()
   @Override
   public void setBeanName(String beanName) {
+    System.out.println(beanNamePrefix + " call setBeanName() method of BeanNameAware interface");
     this.beanName = beanName;
     this.beanNamePrefix = "[" + this.beanName + "] ";
   }
@@ -75,6 +78,23 @@ public class Car implements InitializingBean, BeanNameAware,
       System.out.println(beanNamePrefix + "ERROR: You must set " +
           "the name property of any beans of Car type!");
     }
+  }
+
+  // simply return the instantiated bean as-is
+  @Override
+  public Object postProcessBeforeInitialization(Object bean, String beanName)
+      throws BeansException {
+    System.out.println(beanNamePrefix
+        + "call postProcessBeforeInitialization() method");
+    return bean; // we could potentially return any object reference here...
+  }
+
+  @Override
+  public Object postProcessAfterInitialization(Object bean, String beanName)
+      throws BeansException {
+    System.out.println(beanNamePrefix
+        + "call postProcessAfterInitialization() method");
+    return bean;
   }
 
 
