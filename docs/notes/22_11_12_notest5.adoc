@@ -12,3 +12,33 @@ link:https://ru.wikipedia.org/wiki/%D0%9A%D1%80%D0%B0%D1%81%D0%BD%D0%BE-%D1%87%D
 - Wait notify notifyAll - link:https://itsobes.ru/JavaSobes/wait-notify-notifyall/[itsobes] - +
 Чтобы вызывать эти методы у объекта, необходимо чтобы был захвачен его монитор (т.е. нужно быть внутри synchronized-блока на этом объекте). +
 В противном случае будет выброшено IllegalMonitorStateException. Нужно понимать, как работает monitor lock (блок synchronized) (смотри violet notebook).
+
+- ACID - link:https://habr.com/ru/post/555920/[habr] +
+Atomicity — Атомарность +
+Consistency — Согласованность +
+Isolation — Изолированность +
+Durability — Надёжность
+
+- Java metaspace - link:https://topjava.ru/blog/permgen-and-metaspace[topjava] и link:https://warrenqi.github.io/2021/08/12/jvm-metaspace-evo.html[warrenqi] +
+Там хранятся метаданные класса - имя класса, именя полей, методы, конструктор и пр. Возможно - classLoader;
+- JDBC - 2 статьи - link:https://javarush.com/groups/posts/2172-jdbc-ili-s-chego-vsje-nachinaetsja[javarush] и link:http://www.javenue.info/post/java-jdbc-api[javenue]; CallableStatement (и хранимые процедуры) - link:https://coderlessons.com/tutorials/java-tekhnologii/uznaite-jdbc/jdbc-zaiavleniia-preparedstatement-i-callablestatement[coderlessons]
+- Хранимые процедуры (postgres) - link:https://postgrespro.ru/docs/postgresql/11/xfunc-sql[postgrespro]
+- SQL Мартин Грубер (книга читать онлайн) - link:http://bourabai.ru/alg/sql03.htm[bourabai]
+- Database partitioning - link:https://en.wikipedia.org/wiki/Partition_(database)[wiki]. Если по существу, то +
+*_1)_* *_горизонтальная_* = потребители с телефонным кодом "+7" хранятся в таблице "ru_phones", а с телефонным кодом "+375" -  в таблице "by_phones". Чтобы посмотреть всех потребителей, можно сделать SQL Union +
+*_2)_* *_вертикальная_* - создание таблиц с меньшим количеством столбцов - так, можно разделить таблицы пользователей на "phone_codes" и "users_data"; тогда в одной таблице будут храниться все пользователи, а во второй - данные об их телефонны номерах, с кодами и с общим количеством номеров (их может быть >1).
+
+- SQL Union - возможность добавить строки из другой таблицы, выбираются только одинаковые столбцы - link:https://www.w3schools.com/sql/sql_union.asp[w3schools]
+- Sharding / шардинг - link:https://highload.today/sharding-i-replikatsiya/[highload] и link:https://habr.com/ru/comp
+
+- Теорема CAP - утверждение о том, что в любой реализации распределённых вычислений возможно обеспечить не более двух из трёх следующих свойств: +
+*_1) consistency_* - *_согласованность данных_* — во всех вычислительных узлах в один момент времени данные не противоречат друг другу; +
+*_2) availability_* - *_доступность_* — любой запрос к распределённой системе завершается корректным откликом, однако без гарантии, что ответы всех узлов системы совпадают;
+3) *_partition tolerance_* - *_устойчивость к разделению_*  — расщепление распределённой системы на несколько изолированных секций не приводит к некорректности отклика от каждой из секций. +
+Kafka - это CA-система.
+
+- Microservices / Микросервисы - link:https://microservices.io/patterns/microservices.html[about], link:https://microservices.io/[] +
+*_See_* link:../ch4_architecture/sn1_microservices.adoc[]
+
+- String - кодировка не 2 byte = 1 char а когда как, если только английские буквы - то 1 byte - link:https://itsobes.ru/JavaSobes/iz-chego-sostoit-string/[itsobes-1] & link:https://itsobes.ru/JavaSobes/kak-oboiti-strochku/[itsobes-2] +
+Также *_See_* link:../../src/main/java/ch2_plain_java/sn12_strings/Main.java[ch2_plain_java/sn12_strings/...]
