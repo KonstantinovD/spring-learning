@@ -1,0 +1,36 @@
+== Настройка конфигурации различными способами
+
+*Source code:*
+
+_p50_setting_the_configuration/..._ (1) +
+
+
+*Content:*
+
+- 1. Настройка конфигурации различными способами
+- 2. Переопределение AuthenticationProvider
+
+=== 1. Настройка конфигурации различными способами
+
+Spring Security позволяет настроить одно и то же разными способами. Давайте рассмотрим альтренативную конфигурацию *_UserDetailsService_* и *_PasswordEncoder_*.
+
+Возьмем первый проект - после того как мы создали приложение по умолчанию, нам удалось переопределить UserDetailsService и PasswordEncoder, добавив новые реализации в виде bean-компонентов в контексте Spring. Рассмотрим другой способ сделать эти же настройки.
+
+В классе конфигурации вместо определения бинов мы настраиваем их с помощью метода `configure(AuthenticationManagerBuilder auth)`. Мы переопределяем этот метод из класса *WebSecurityConfigurerAdapter* и используем его параметр типа *AuthenticationManagerBuilder* для установки как UserDetailsService, так и PasswordEncoder:
+
+*_See_* _p50_setting_the_configuration/..._
+
+При этом старый метод - `configure(HttpSecurity http)` - никуда не исчезает и по-прежнему используется для настройки. Класс *WebSecurityConfigurerAdapter* содержит три разных перегруженных метода `configure()` которые мы все рассмотрим позднее. +
+Лучше не смешивать оба подхода и конфигурить UserDetailsService и PasswordEncoder либо через бины, либо через метод configure().
+
+Также можно писать что-то вроде inMemoryAuthentication (создавая юзера в chain):
+[source, java]
+----
+auth.inMemoryAuthentication()
+  .withUser("john")
+  .password("12345")
+  .authorities("read")
+  .and()
+.passwordEncoder(NoOpPasswordEncoder.getInstance());
+----
+Но это выглядит плохо.
