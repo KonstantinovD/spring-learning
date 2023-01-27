@@ -1,0 +1,31 @@
+== Using multiple configuration classes in your project
+
+*Source code:*
+
+_p56_use_multiple_configurations/..._ (1) +
+
+*Content:*
+
+- 1. Множественные конфигурации
+- 2. Заключение главы 1
+
+=== 1. Множественные конфигурации
+
+Наша конфигурация все более усложняется - нужно разделить обязанности между разными классами конфигурации. Всегда рекомендуется иметь только один класс для каждой ответственности. Например, мы можем отделить конфигурацию управления пользователями от конфигурации авторизации. Определим два класса конфигурации: *UserManagementConfig* и *WebAuthorizationConfig*:
+
+*_See_* _p56_use_multiple_configurations/..._
+
+*_UserManagementConfig_* содержит только два bean-компонента, отвечающих за управление пользователями: UserDetailsService и PasswordEncoder. Мы настроим два объекта как bean-компоненты, поскольку этот класс не может расширять WebSecurityConfigurerAdapter. +
+В свою очередь, *_WebAuthorizationConfig_* расширяет WebSecurityConfigurerAdapter и
+переопределяет метод `configure(HttpSecurity http)`. +
+(У вас не может быть 2 класса, расширяющих WebSecurityConfigurerAdapter)
+
+=== 2. Заключение главы 1
+
+- Spring Boot предоставляет конфигурации по умолчанию когда вы добавляете Spring Security в зависимости приложения.
+- Базовые компоненты аутентификации и авторизации: *AuthenticationProvider*, который управляет *UserDetailsService* и *PasswordEncoder*.
+- Пользователи определяются классом `User implements userDetails` и должны иметь логин, пароль и права (authorities). Среди прав также могут быть роли (). Подробнее про роли/права *_See_* link:https://www.javadevjournal.com/spring-security/granted-authority-vs-role-in-spring-security/[javadevjournal] и link:https://www.baeldung.com/spring-security-granted-authority-vs-role[baeldung]
+- Простейшая имплементация UserDetailsService - это *InMemoryUserDetailsManager*, который может хранить пользлвателей в памяти.
+- *NoOpPasswordEncoder* - имплементация PasswordEncoder, которая использует пароль в виде plaintext.
+- *AuthenticationProvider*, который управляет UserDetailsService и PasswordEncoder, также может быть переопределен.
+
