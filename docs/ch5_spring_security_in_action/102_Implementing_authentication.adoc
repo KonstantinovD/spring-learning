@@ -1,5 +1,9 @@
 == Реализация аутентификации
 
+*Source code:*
+
+_p102_Implementing_authentication/..._ (3)
+
 *Content:*
 
 - 1. Intro
