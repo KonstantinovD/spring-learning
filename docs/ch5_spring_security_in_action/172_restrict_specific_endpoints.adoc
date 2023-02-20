@@ -8,7 +8,7 @@
 
 *Content:*
 
-- 1. Настройка ограничений для отдельных урлов
+- 1. Настройка ограничений для отдельных urls. Matchers
 - 2. Разница между antMatchers/mvcMatchers/regex matchers
   * 2.1 mvcMatcher
   * 2.2 antMatcher
@@ -19,7 +19,7 @@
 - 6. mvcMatchers and regex in path variable
 
 
-=== 1. matchers - Методы сопоставления урлов
+=== 1. Настройка ограничений для отдельных urls. Matchers
 
 Ранее мы настраивали ограничения либо для всех урлов, либо используя метод *_.antMatchers("...")_*. Данный метод сопоставления урлов и подобные ему мы еще обсудим далее.
 
@@ -149,7 +149,7 @@ http.authorizeRequests().regexMatchers("/(en|es|zh)").authenticated()
 
 === 3. Реализация mvcMatchers
 
-Реализуем пример с _MVC matchers_ - *_See_* _p172_restrict_specific_endpoints/..._:
+Реализуем пример с _MVC matchers_ - *_See_* link:../../spring-security-learning/src/main/java/ch5_spring_security_in_action/p172_restrict_specific_endpoints[p172_restrict_specific_endpoints/...]:
 [source, java]
 ----
 @Configuration
