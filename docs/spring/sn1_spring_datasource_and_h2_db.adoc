@@ -39,9 +39,9 @@ _spring-security-learning/.../resources/application-with-h2_p79.properties_
 
 Для того чтобы БД (c именем test) сохранялась в файл, надо использовать конструкцию типа:
 ----
-spring.datasource.url=jdbc:h2:file:C:/users/path/embedded-db/test
+spring.datasource.url=jdbc:h2:file:C:/.../DRIVE/embedded-db/test
 ----
-Но после рестарта приложения файл не перезапишется, надо удялать текущий файл будет. В обычном случае все-таки профитнее использовать обычную in-memory db (хотя доступа к ей из UI не будет).
+Но после рестарта приложения файлы в папке `embedded-db/test` не перезапишутся, надо удалять текущий файл будет. Либо - если вы рестартуете одно и то же приложение - использовать конструкцию `create schema if not exists <schema_name>` (cм. link:../../spring-security-learning/src/main/resources/schema_p79.sql[schema_p79.sql]). В обычном случае все-таки профитнее использовать обычную in-memory db (хотя доступа к ней из UI не будет).
 ----
 spring.datasource.url=jdbc:h2:mem:test
 ----
