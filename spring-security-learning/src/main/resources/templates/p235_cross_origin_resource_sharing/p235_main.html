@@ -1,0 +1,21 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <script>
+        const http = new XMLHttpRequest();
+        // Calls the endpoint using 127.0.0.1 as host to simulate the cross-origin call
+        const url='http://127.0.0.1:8080/test';
+        http.open("POST", url);
+        http.send();
+        http.onreadystatechange = (e) => {
+            // Sets the response body to the output div in the page body
+            document
+                .getElementById("output")
+                .innerHTML = http.responseText;
+        }
+    </script>
+</head>
+<body>
+<div id="output"></div>
+</body>
+</html>
