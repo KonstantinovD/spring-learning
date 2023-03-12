@@ -1,0 +1,209 @@
+== Resource server - implementation overview
+
+*Source code:*
+
+-  *_not working_*
+
+*Content:*
+
+- 1. Что такое сервер ресурсов
+- 2. Написание собственной реализации resource server (without source code)
+- 3. Тест case1: resource server напрямую вызывает authorization server
+- 4. Сравнение подходов: Вызов authorization server напрямую VS Общая база данных (blackboarding)
+
+=== 1. Что такое сервер ресурсов
+
+С точки зрения OAuth 2 _resource server_ - это бэкенд, который вы защищаете от атак. Чтобы разрешить клиенту доступ к ресурсам, серверу ресурсов требуется действительный токен доступа. Клиент получает токен доступа с сервера авторизации и использует его для вызова ресурсов на сервере ресурсов, добавляя токен в заголовки HTTP-запроса.
+
+При имплементации _resource server_ важно выбрать, каким образом сервер ресурсов будет проверять токены. У нас есть несколько вариантов реализации проверки токена, и мы рассмотрим три варианта - сначала кратко, а затем подробно:
+
+- 1) _Resource server_ напрямую вызывает _authorization server_ для проверки выданного токена:
+
+image:img/oauth2_implem_resource_server_check_token_way1_schema.png[]
+
+- 2) Используется _общая база данных_, где _authorization server_ хранит токены, а _resource server_ получает доступ к базе и проверяет токен. Этот подход также называется *_blackboarding_* (_классная доска_):
+
+image:img/oauth2_implem_resource_server_check_token_way2_blackboarding_schema.png[]
+
+- 3) Используются криптографические подписи. _Authorization server_ подписывает токен при его выдаче, а _resource server_ проверяет подпись. В этом случае обычно используются JSON Web Tokens (JWT). Мы обсудим этот подход в главе 15:
+
+image:img/oauth2_implem_resource_server_check_token_way3_jwt_tokens_schema.png[]
+
+=== 2. Написание собственной реализации resource server (without source code)
+
+Для начала мы будем использовать дефолтную реализацию Spring Boot, которая позволяет серверу ресурсов напрямую вызывать сервер авторизации, чтобы узнать, действителен ли токен.
+
+Целью сервера ресурсов является управление и защита ресурсов пользователя. Нам нужен ресурс, к которому мы хотим получить доступ. Мы создадим эндпоинт *_/hello_* для наших тестов:
+[source, java]
+----
+@RestController
+public class HelloController {
+    @GetMapping("/hello")
+    public String hello() {
+        return "Hello!";
+    }
+}
+----
+
+Еще нам нужен класс конфигурации, в котором мы используем аннотацию *_@EnableResourceServer_*, чтобы позволить Spring Boot настроить дефолтную реализацию сервера ресурсов:
+[source, java]
+----
+@Configuration
+@EnableResourceServer
+public class ResourceServerConfig {
+}
+----
+
+Однако мы не настроили способ, которым сервер ресурсов может проверять токены. Наш сервер ресурсов не может проверить, что это действительные токены, что сервер авторизации действительно их выдал. Это связано с тем, что мы не реализовали какие-либо параметры, которые сервер ресурсов должен проверять для проверки токенов доступа. Давайте воспользуемся этим подходом и обсудим возможные варианты.
+
+*_NOTE!_* Аннотация _@EnableResourceServer_, являющаяся частью проекта Spring Security OAuth, недавно была помечена как устаревшая. В руководстве по миграции Spring Security team предлагает использовать методы настройки непосредственно из Spring Security. При этом существует еще много проектов, которые используют эту анноташку.
+
+При этом, если мы будем использовать имплементированный ранее сервер авторизации, мы можем использовать дефолтный его эндпоинт - *_/oauth/check_token_* - но должны будем проапдейтить код link:../../spring-security-learning/src/main/java/ch5_spring_security_in_action/p316_implement_auth_server/config/AuthServerConfig.java[AuthServerConfig.java] (сейчас все вызовы этого эндпоинта будут отклонены):
+
+[source, java]
+----
+@Configuration
+@EnableAuthorizationServer
+public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
+
+  // omitted code
+
+  public void configure(AuthorizationServerSecurityConfigurer security) {
+    security.checkTokenAccess("isAuthenticated()");
+  }
+}
+----
+
+В таком случае ("_isAuthenticated()_", можно было написать "_permitAll()_") сервер ресурсов должен тоже зарегаться как клиент, чтобы получать доступ к токену проверки (link:../../spring-security-learning/src/main/java/ch5_spring_security_in_action/p316_implement_auth_server/config/AuthServerConfig.java[AuthServerConfig.java]):
+
+[source, java]
+----
+@Configuration
+@EnableAuthorizationServer
+public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
+
+  // omitted code
+
+  @Override
+  public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+    InMemoryClientDetailsService service = new InMemoryClientDetailsService();
+    BaseClientDetails cd = new BaseClientDetails();
+
+    cd.setClientId("client");
+    cd.setClientSecret("secret");
+    cd.setScope(List.of("read"));
+    cd.setAuthorizedGrantTypes(List.of("password", "refresh_token"));
+    // регистрируем клиента resource server
+    BaseClientDetails resourceServerCD = new BaseClientDetails();
+    resourceServerCD.setClientId("resourceserver");
+    resourceServerCD.setClientSecret("resourceserversecret");
+    resourceServerCD.setScope(List.of("read"));
+    // добавляем двух клиентов
+    service.setClientDetailsStore(Map.of("client", cd, "resourceserver", resourceServerCD));
+    clients.withClientDetails(service);
+  }
+
+  // omitted code
+}
+----
+
+=== 3. Тест case1: resource server напрямую вызывает authorization server
+
+Запустим _authorization server_ и запросим у него токен:
+----
+curl -v -XPOST -u client:secret
+"http://localhost:8080/oauth/token?grant_type=password&username=john&password=12345&scope=read"
+----
+Получаем что-то такое:
+[source, json]
+----
+{
+  "access_token":"4f2b7a6d-ced2-43dc-86d7-cbe844d3e16b",
+  "token_type":"bearer",
+  "refresh_token":"a4bd4660-9bb3-450e-aa28-2e031877cb36",
+  "expires_in":43199,
+  "scope":"read"
+}
+----
+Давайте теперь проверим этот токен, используя эндпоинт *_/oauth/check_token_*:
+----
+curl -XPOST -u resourceserver:resourceserversecret
+"http://localhost:8080/oauth/check_token?token=4f2b7a6d-ced2-43dc-86d7-cbe844d3e16b"
+----
+Получаем что-то такое:
+[source, json]
+----
+{
+  "active":true,
+  "exp":1581307166,
+  "user_name":"john",
+  "authorities":["read"],
+  "client_id":"resourceserver",
+  "scope":["read"]
+}
+----
+В response содержится вся необходимая информация о токене доступа:
+
+- Активен ли токен и когда истекает срок его действия
+- Пользователь, для которого был выпущен токен
+- Полномочия (authorities) данного токена
+- Клиент, для которого был выпущен токен (_resourceserver_)
+
+Теперь рассмотрим наш сервер ресурсов. Нам нужно настроить эндпоинт к серверу авторизации и креды клиента, которые сервер ресурсов использует для доступа к эндпоинту. Все это мы можем сделать в файле application.properties:
+
+[source, properties]
+----
+server.port=9090 # запускаем сервер ресурсов на другом порту
+
+security.oauth2.resource.token-info-uri=http://localhost:8080/oauth/check_token
+
+security.oauth2.client.client-id=resourceserver
+security.oauth2.client.client-secret=resourceserversecret
+----
+
+После запуска сервера ресурсов (на 9090 порту) мы можем вызвать эндпоинт *_/hello_* с bearer-токеном:
+----
+curl -H "Authorization: bearer 4f2b7a6d-ced2-43dc-86d7-cbe844d3e16b"
+"http://localhost:9090/hello"
+----
+И получим успешный ответ (200 OK):
+----
+Hello!
+----
+
+=== 4. Сравнение подходов: Вызов authorization server напрямую VS Общая база данных (blackboarding)
+
+[cols="1,4,4"]
+|===
+|ПОДХОД
+|ПРЕИМУЩЕСТВА
+|НЕДОСТАТКИ
+
+|Вызов _authorization server_ напрямую
+|Простота реализации
+
+Можно применить к любой реализации токена (flow)
+
+|Прямая зависимость _resource server_ от _authorization server_
+
+Нагрузка на _authorization server_ и _network_
+
+Неспособность работать, если _authorization server_ недоступен по сети, но клиент уже получил валидный токен. При перезапуске сервера авторизации - все токены становятся невалидными
+
+|Общая база данных (_blackboarding_)
+|Нет зависимости _resource server_ от _authorization server_
+
+Можно применить к любой реализации токена (flow)
+
+Хранение токенов позволяет авторизации работать и после перезапуска сервера авторизации, и если сервер авторизации недоступен
+|Сложнее реализовать, чем прямой вызов
+
+Требуется общая база данных
+
+Общая база данных может стать узким местом в системе и повлиять на производительность
+|===
+
+
+
+
+

@@ -7,6 +7,7 @@ import org.springframework.security.oauth2.config.annotation.configurers.ClientD
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
+import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.client.BaseClientDetails;
 import org.springframework.security.oauth2.provider.client.InMemoryClientDetailsService;
 
@@ -35,8 +36,13 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     cd.setClientSecret("secret");
     cd.setScope(List.of("read"));
     cd.setAuthorizedGrantTypes(List.of("password", "refresh_token"));
-
-    service.setClientDetailsStore(Map.of("client", cd));
+    // регистрируем клиента resource server
+    BaseClientDetails resourceServerCD = new BaseClientDetails();
+    resourceServerCD.setClientId("resourceserver");
+    resourceServerCD.setClientSecret("resourceserversecret");
+    resourceServerCD.setScope(List.of("read"));
+    // добавляем двух клиентов
+    service.setClientDetailsStore(Map.of("client", cd, "resourceserver", resourceServerCD));
     clients.withClientDetails(service);
   }
 
@@ -50,4 +56,7 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
 //        .scopes("read");
 //  }
 
+  public void configure(AuthorizationServerSecurityConfigurer security) {
+    security.checkTokenAccess("isAuthenticated()");
+  }
 }
