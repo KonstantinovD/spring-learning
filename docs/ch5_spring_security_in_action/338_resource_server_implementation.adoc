@@ -3,6 +3,7 @@
 *Source code:*
 
 -  *_not working_*
+- - link:../../spring-security-oauth2-second-auth-server/src/main/java/[spring-security-oauth2-second-auth-server/...] (5) - *_not working_*
 
 *Content:*
 
@@ -10,6 +11,7 @@
 - 2. Написание собственной реализации resource server (without source code)
 - 3. Тест case1: resource server напрямую вызывает authorization server
 - 4. Сравнение подходов: Вызов authorization server напрямую VS Общая база данных (blackboarding)
+- 5. Baelding - Spring Security OAuth Authorization Server
 
 === 1. Что такое сервер ресурсов
 
@@ -203,7 +205,11 @@ Hello!
 Общая база данных может стать узким местом в системе и повлиять на производительность
 |===
 
+=== 5. Baelding - Spring Security OAuth Authorization Server
 
+link:https://www.baeldung.com/spring-security-oauth-auth-server[baeldung - spring-security-oauth-auth-server]
+
+Есть и другой вариант реализации Auth Server - link:../../spring-security-oauth2-second-auth-server/src/main/java/[spring-security-oauth2-second-auth-server/...] Это все описано в туториале link:https://www.baeldung.com/spring-security-oauth-auth-server[baeldung]. К сожалению, возникает ошибка, что невозможно достучаться до issuer-url *_http://auth-server:9000_*.
 
 
 
