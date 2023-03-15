@@ -2,7 +2,7 @@
 
 *Source code:*
 
-- link:../../spring-security-learning/src/main/java/ch5_spring_security_in_action/p316_implement_auth_server/[p316_implement_auth_server/...] (2-5) - *_not working_*
+- link:../../custom-spring-security-auth-server/src/main/java/p316_implement_auth_server/[p316_implement_auth_server/...] (2-5) - *_not working_*
 
 *Content:*
 
