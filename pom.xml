@@ -6,6 +6,7 @@
     <modules>
         <module>spring-security-learning</module>
         <module>custom-spring-security-auth-server</module>
+        <module>spring-security-oauth2-second-auth-server</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
