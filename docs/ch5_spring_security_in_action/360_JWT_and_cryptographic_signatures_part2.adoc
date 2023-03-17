@@ -381,4 +381,4 @@ public class CustomTokenEnhancer implements TokenEnhancer {
 ----
 Который мы потом подключаем в наш класс конфигурации. Подробнее смотри на link:https://www.baeldung.com/spring-security-oauth-jwt-legacy#enhancer[baelding - jwt enhancer].
 
-К слову, baelding утверждает что данный стек Spring Security - устаревший (deprecated).
+К слову, baelding утверждает что данный стек Spring Security - устаревший (deprecated). Вместо этого для добавления параметров в токен лучше использовать *_OAuth2AuthorizationRequestResolver_* и *_OAuth2AccessTokenResponseHttpMessageConverter_*, переопределив их методы - link:https://www.baeldung.com/spring-security-custom-oauth-requests[baelding - custom-oauth-requests].
