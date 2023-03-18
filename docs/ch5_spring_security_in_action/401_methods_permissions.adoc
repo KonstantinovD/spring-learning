@@ -1,0 +1,377 @@
+== Implementing permissions for methods
+
+*Source code:*
+
+- link:../../spring-security-learning/src/main/java/ch5_spring_security_in_action/p401_methods_permissions[p401_methods_permissions/...] (2-4)
+
+*Content:*
+
+- 1. PermissionEvaluator intro
+- 2. Implementation - model & три кейса - три эндпоинта
+- 3. Implementation - case1 - получение сведений о всём документе
+- 4. Implementation - case2/case3 - получение сведений об owner/extension
+- 5. Custom MethodSecurityExpressionHandler - for custom expressions
+
+=== 1. PermissionEvaluator intro
+
+В предыдущих примерах мы определяли правила авторизации с помощью простых выражений. Что, если логика авторизации более сложная, и для ее реализации придётся написать огромное выражение на языке _SpEL_. Spring Security позволяет писать правила авторизации _в отдельном классе_ - это концепция *_permissions_* (_разрешений_) в Spring Security.
+
+Для реализации логики _permissions_ необходимо реализовать интерфейс *_PermissionEvaluator_*. Интерфейс _PermissionEvaluator_ предоставляет два метода - два способа реализации _permissions_:
+
+- `hasPermission(Authentication authentication, Object targetDomainObject, Object permission)` +
+_PermissionEvaluator_ получает два объекта: на *_targetDomainObject_* распространяется правило авторизации, а объект *_permission_* содержит дополнительные сведения, необходимые для реализации логики _permissions_. Параметр _**authentication_** неявно передаётся в _SpEL_-выражении.
+
+- `hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission)` +
+_PermissionEvaluator_ получает три объекта: *_targetId_* - id объекта, на который распространяется правило авторизации, *_targetType_* - тип данного объекта и всё тот же объект *_permission_*. Предполагается, что _PermissionEvaluator_ извлекает необходимый объект самостоятельно. Тип объекта _targetType_ используется, если один и тот же _PermissionEvaluator_ применяется к разным типам объектов, которые нужно по-разному обрабатывать. Параметр *_authentication_* неявно передаётся в _SpEL_-выражении.
+
+=== 2. Implementation - model/repository & три кейса - три эндпоинта
+
+Давайте сразу начнем с примера. Приложение управляет документами - это его основные сущности (_Document, DocumentInfo_). У любого link:../../spring-security-learning/src/main/java/ch5_spring_security_in_action/p401_methods_permissions/model/Document.java[Document.java] есть *_code_* - его _id_ - и *_owner_* - это имя пользователя, создавшего документ. Кроме того, расширение *_Document_* - его наследник link:../../spring-security-learning/src/main/java/ch5_spring_security_in_action/p401_methods_permissions/model/DocumentInfo.java[DocumentInfo.java] - хранит в себе *_extension_* - расширение документа (_txt, doc, pdf, etc._):
+
+[source, java]
+----
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+public class Document {
+    @NonNull
+    private String code;
+    @NonNull
+    private String owner;
+}
+----
+
+[source, java]
+----
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class DocumentInfo extends Document {
+
+  private String extension;
+  // lombok cannot call super constructor with params
+  public DocumentInfo(@NonNull String owner, String extension) {
+    super(owner);
+    this.extension = extension;
+  }
+}
+----
+
+Данные о документах хранянтся в Map в link:../../spring-security-learning/src/main/java/ch5_spring_security_in_action/p401_methods_permissions/repositories/DocumentRepository.java[DocumentRepository.java] и мы их получаем по _document code_:
+
+[source, java]
+----
+@Repository
+public class DocumentRepository {
+    private Map<String, Document> documents =
+            Map.of("abc123", new Document("abc123", "emma"),
+                "qwe123", new Document("qwe123", "emma"),
+                "asd555", new Document("asd555", "natalie"),
+                "a123", new DocumentInfo("a123", "natalie", "doc"),
+                "b456", new DocumentInfo("b456", "natalie", "pdf"),
+                "c789", new DocumentInfo("c789", "emma", "doc")
+            );
+
+    public Document findDocument(String code) {
+        return documents.get(code);
+    }
+}
+----
+
+Есть три кейса использования приложения:
+
+- 1. Пользователь может получить сведения о всём документе +
+URL - `/documents/{code}`
+- 2. Пользователь может получить *_owner_* (владельца) документа +
+URL - `/documents/extension/{code}`
+- 3. Пользователь может получить *_extension_* документа +
+URL - `/documents/owner/{code}`
+
+Для первого кейса реализуем метод *_hasPermission(Authentication, Object, Object)_* +
+Для второго и третьего - *_hasPermission(Authentication, Serializable, String, Object)_*
+
+=== 3. Implementation - case1 - получение сведений о всём документе
+
+Пользователь может получить сведения о существующем документе, если он - владелец документа или _admin_. Для этого мы в нашем кастомном *_PermissionEvaluator_* реализуем метод `hasPermission(Authentication, Object, Object)` - link:../../spring-security-learning/src/main/java/ch5_spring_security_in_action/p401_methods_permissions/security/DocumentsPermissionEvaluator.java[DocumentsPermissionEvaluator.java]:
+[source, java]
+----
+@Component
+public class DocumentsPermissionEvaluator implements PermissionEvaluator {
+
+    // юзер может получить только документы с его именем,
+    // а юзер со специфичной permission ('ROLE_admin') - все документы
+    @Override
+    public boolean hasPermission(Authentication authentication,
+                                 Object target,
+                                 Object permission) {
+        Document document = (Document) target;
+        String p = (String) permission;
+        // пользователь с role которая передана в expression - всегда имеет доступ
+        boolean permission_role_matches =
+           authentication.getAuthorities()
+           .stream()
+           .anyMatch(a -> a.getAuthority().equals(p));
+        // если есть специфичная role или owner документа равен текущему пользователю
+        return permission_role_matches || document.getOwner().equals(authentication.getName());
+    }
+
+    // ... omitted code
+}
+----
+
+Чтобы Spring Security знал о нашей новой реализации _PermissionEvaluator_, мы должны переопределить *_MethodSecurityExpressionHandler_* в классе конфигурации. Здесь мы используем реализацию для _MethodSecurityExpressionHandler_ с именем *_DefaultMethodSecurityExpressionHandler_*, которую предоставляет Spring Security. Мы можем написать свой класс конфигурации так, переопределив метод класса *_GlobalMethodSecurityConfiguration_* (commented in link:../../spring-security-learning/src/main/java/ch5_spring_security_in_action/p401_methods_permissions/config/ProjectConfig.java[ProjectConfig.java]):
+[source, java]
+----
+@Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class ProjectConfig extends GlobalMethodSecurityConfiguration {
+
+    @Autowired // иньекция кастомного PermissionEvaluator
+    private DocumentsPermissionEvaluator evaluator;
+
+    @Override
+    protected MethodSecurityExpressionHandler createExpressionHandler() {
+        // дефолтная реализация MethodSecurityExpressionHandler
+        DefaultMethodSecurityExpressionHandler expressionHandler =
+            new DefaultMethodSecurityExpressionHandler();
+        // устанавливаем наш кастомный DocumentsPermissionEvaluator
+        expressionHandler.setPermissionEvaluator(evaluator);
+        return expressionHandler;
+    }
+
+    // ... UserDetailsService & PasswordEncoder beans
+}
+----
+
+Но, поскольку *_@EnableGlobalMethodSecurity_* и, что немаловажно, *_GlobalMethodSecurityConfiguration_* _deprecated_ в Spring Security 5.8.0, лучше реализовать *_MethodSecurityExpressionHandler_* в виде bean и использовать *_@EnableMethodSecurity_* - см link:../../spring-security-learning/src/main/java/ch5_spring_security_in_action/p401_methods_permissions/config/ProjectConfig.java[ProjectConfig.java]:
+[source, java]
+----
+@Configuration
+@EnableMethodSecurity
+public class ProjectConfig {
+
+    @Autowired // иньекция кастомного PermissionEvaluator
+    private DocumentsPermissionEvaluator evaluator;
+
+    @Bean
+    protected MethodSecurityExpressionHandler createExpressionHandler() {
+        // дефолтная реализация MethodSecurityExpressionHandler
+        DefaultMethodSecurityExpressionHandler expressionHandler =
+            new DefaultMethodSecurityExpressionHandler();
+        // устанавливаем наш кастомный DocumentsPermissionEvaluator
+        expressionHandler.setPermissionEvaluator(evaluator);
+        return expressionHandler;
+    }
+
+    // ... omitted code
+}
+----
+
+Тперь мы можем использовать правило авторизации в виде `"hasPermission(returnObject, 'ROLE_admin')"`, когда мы получаем информацию о всём документе по урлу `/documents/{code}`. Определим наш кастомный экспрешшн в методе *_getDocument()_* сервиса link:../../spring-security-learning/src/main/java/ch5_spring_security_in_action/p401_methods_permissions/services/DocumentService.java[DocumentService.java]:
+[source, java]
+----
+@Service
+public class DocumentService {
+
+    @Autowired
+    private DocumentRepository documentRepository;
+
+    @PostAuthorize("hasPermission(returnObject, 'ROLE_admin')")
+    public Document getDocument(String code) {
+        return documentRepository.findDocument(code);
+    }
+
+    // ... omitted code
+}
+----
+
+Запустим и протестируем приложение.
+
+- 1) Залогинимся с кредами `natalie/12345` - пользователя с ролью _manager_ - этот пользователь может просматривать только документы, у которых `owner=natalie`:
+
+----
+http://localhost:8080/documents/asd555
+->
+200 OK, {"code":"asd555","owner":"natalie"}
+
+http://localhost:8080/documents/qwe123
+->
+403 Forbidden
+----
+
+- 2) Залогинимся с кредами `emma/12345` - пользователя с ролью _admin_ - - этот пользователь может просматривать все документы:
+
+----
+http://localhost:8080/documents/asd555
+->
+200 OK, {"code":"asd555","owner":"natalie"}
+
+http://localhost:8080/documents/qwe123
+->
+200 OK, {"code":"qwe123","owner":"emma"}
+----
+
+Во избежание путаницы надо упомянуть, что нам не нужно передавать объект *_Authentication_*. Платформа Spring Security автоматически подставляет значение этого параметра при вызове метода *_hasPermission()_*, поскольку он уже находится в *_SecurityContext_*.
+
+=== 4. Implementation - case2/case3 - получение сведений об owner/extension
+
+Теперь давайте реализуем второй метод - *_hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission)_*. Второй метод использует _id_ объекта и _targetType_ вместо самого обьекта. Например, предположим, что мы хотим применять правила авторизации до выполнения метода, используя _@PreAuthorize_. В этом случае у нас еще нет объекта _Document_, но зато есть параметр *_code_* - код документа. Мы можем самостоятельно достать объект _Document_ из базы и проверить все необходимые значения. Параметр targetType можно использовать для идентификации как самого объекта, так и для идентификации любого другого значения. Мы выбираем второй вариант - это выглядит как костыль, но позволяет нам заимплементить любое другое поведение.
+
+Итак:
+
+- *_Case 2_*: Пользователь может получить сведения об _owner_-е документа, если он - владелец документа или _admin_.
+- *_Case 3_*: Пользователь может получить _extension_ документа - если он _admin_ или если расширение из списка [_"txt", "doc", "docs"_].
+
+Для этого мы в нашем кастомном *_PermissionEvaluator_* реализуем метод `hasPermission(Authentication, Serializable, String, Object)` - link:../../spring-security-learning/src/main/java/ch5_spring_security_in_action/p401_methods_permissions/security/DocumentsPermissionEvaluator.java[DocumentsPermissionEvaluator.java]:
+
+[source, java]
+----
+@Component
+public class DocumentsPermissionEvaluator implements PermissionEvaluator {
+
+    // ... omitted code
+
+    @Autowired
+    private DocumentRepository documentRepository;
+
+    private static final Set<String> allowedExtensions = Set.of("txt", "doc", "docs");
+
+    @Override
+    public boolean hasPermission(Authentication authentication,
+                                 Serializable targetId,
+                                 String targetType,
+                                 Object permission) {
+        // сначала проверяем permissions
+        String p = (String) permission;
+        // пользователь с role которая передана в expression - всегда имеет доступ
+        boolean permission_role_matches =
+            authentication.getAuthorities()
+                .stream()
+                .anyMatch(a -> a.getAuthority().equals(p));
+        if (permission_role_matches) return true;
+        // логика для "owner" аналогична другому методу hasPermission(Authentication, Object, Object)
+        // логика для "extension" - не для 'admin' разрешены только расширения "txt", "doc", "docs"
+        String code = targetId.toString();
+        Document document = documentRepository.findDocument(code);
+        switch (targetType) {
+            case "extension": {
+                if (document instanceof DocumentInfo) {
+                    String extension = ((DocumentInfo) document).getExtension();
+                    return allowedExtensions.contains(extension);
+                } else {
+                    return true;
+                }
+            }
+            case "owner": {
+                return document.getOwner().equals(authentication.getName());
+            } default: {
+                return false;
+            }
+        }
+    }
+}
+----
+
+Тперь мы можем использовать правило авторизации в виде `"hasPermission(#code, 'owner', 'ROLE_admin')"` или `"hasPermission(#code, 'extension', 'ROLE_admin')"`: link:../../spring-security-learning/src/main/java/ch5_spring_security_in_action/p401_methods_permissions/services/DocumentService.java[DocumentService.java]:
+
+[source, java]
+----
+@Service
+public class DocumentService {
+
+    @Autowired
+    private DocumentRepository documentRepository;
+
+    // ... omitted code
+
+    // мы хотим применять правила авторизации до выполнения метода
+    @PreAuthorize("hasPermission(#code, 'owner', 'ROLE_admin')")
+    public String getDocumentOwner(String code) {
+        Document d = documentRepository.findDocument(code);
+        if (d != null) {
+            return d.getOwner();
+        } else {
+            return null;
+        }
+    }
+
+    // мы хотим применять правила авторизации до выполнения метода
+    @PreAuthorize("hasPermission(#code, 'extension', 'ROLE_admin')")
+    public String getDocumentExtension(String code) {
+        Document d = documentRepository.findDocument(code);
+        if (d instanceof DocumentInfo) {
+            return ((DocumentInfo) d).getExtension();
+        } else {
+            return null;
+        }
+    }
+}
+----
+
+Запустим и протестируем приложение.
+
+- 1) Залогинимся с кредами `natalie/12345` - пользователя с ролью _manager_. Во-первых, этот пользователь может запрашивать значение *_owner_* только у тех документов, у которых `owner=natalie`. Во-вторых, этот пользователь может получить *_extension_* только у документов с расширениями [_"txt", "doc", "docs"_]:
+
+----
+http://localhost:8080/documents/owner/a123
+->
+200 OK, natalie
+
+http://localhost:8080/documents/owner/b456
+->
+200 OK, natalie
+
+http://localhost:8080/documents/owner/c789
+->
+403 Forbidden
+----
+
+----
+http://localhost:8080/documents/extension/a123
+->
+200 OK, doc
+
+http://localhost:8080/documents/extension/b456
+->
+403 Forbidden - (потому что extension = 'pdf')
+
+http://localhost:8080/documents/extension/c789
+->
+200 OK, docx
+----
+
+- 2) Залогинимся с кредами `emma/12345` - пользователя с ролью _admin_ - этот пользователь может значение *_owner_* и значение *_extension_* у любых документов:
+
+----
+http://localhost:8080/documents/owner/a123
+->
+200 OK, natalie
+
+http://localhost:8080/documents/owner/b456
+->
+200 OK, natalie
+
+http://localhost:8080/documents/owner/c789
+->
+200 OK, emma
+----
+
+----
+http://localhost:8080/documents/extension/a123
+->
+200 OK, doc
+
+http://localhost:8080/documents/extension/b456
+->
+200 OK, pdf
+
+http://localhost:8080/documents/extension/c789
+->
+200 OK, docx
+----
+
+=== 5. Custom MethodSecurityExpressionHandler - for custom expressions
+
+Если нам не хватает двух методов интерфейса _PermissionEvaluator_, мы также можем реализовать свой кастомный _MethodSecurityExpressionHandler_ для определения кастомных выражений _SpEL_, которые будем использовать для применения своих очень специфических правил авторизации. Это применяется очень редко, пример этого можно увидеть на link:https://www.baeldung.com/spring-security-create-new-custom-security-expression[Baeldung - custom-security-expressions].
+
