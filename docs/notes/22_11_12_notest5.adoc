@@ -38,7 +38,7 @@ Durability — Надёжность
 Kafka - это CA-система.
 
 - Microservices / Микросервисы - link:https://microservices.io/patterns/microservices.html[about], link:https://microservices.io/[] +
-*_See_* link:../ch4_architecture/sn1_microservices.adoc[]
+*_See_* link:../ch4_architecture/p0_microservices_notes.adoc[]
 
 - String - кодировка не 2 byte = 1 char а когда как, если только английские буквы - то 1 byte - link:https://itsobes.ru/JavaSobes/iz-chego-sostoit-string/[itsobes-1] & link:https://itsobes.ru/JavaSobes/kak-oboiti-strochku/[itsobes-2] +
 Также *_See_* link:../../src/main/java/ch2_plain_java/sn12_strings/Main.java[ch2_plain_java/sn12_strings/...]
