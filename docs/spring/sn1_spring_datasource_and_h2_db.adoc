@@ -74,3 +74,16 @@ image:img/H2_login.png[]
 И потом можно зайти на страницу H2:
 
 image:img/H2_page.png[]
+
+При получении ошибки (использование файловой БД):
+----
+Database "..." not found, either pre-create it or allow remote database creation (not recommended in secure environments) [90149-200] 90149/90149
+----
+
+Просто создайте файлик `test.mv.db` внутри вашей папки (test или другое имя, зависит от имени вашей БД).
+
+*NOTE!* либо оставляйте дефолтную schema - public - и не надо ее создавать в schema.sql; либо переименуйте схему, укажите ее в properties и создайте в schema.sql:
+[source, properties]
+----
+spring.jpa.properties.hibernate.default_schema=testname
+----
