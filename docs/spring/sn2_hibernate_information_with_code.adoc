@@ -1,0 +1,130 @@
+== Hibernate tips
+
+*Source code:*
+
+- link:../../spring-security-learning/src/main/java/ch3_database/sn1_test_deletion_hibernate/[ch3_database/sn1_test_deletion_hibernate/...]
+
+*Content:*
+
+- 1. Hibernate и bidirectional link
+
+=== 1. Hibernate и bidirectional link
+
+Рассмотрим ситуацию: две таблицы - _Post_ и _Comment_. У _Post_ может быть несколько _Comment_:
+
+image:img/db_sample_schema.png[]
+
+Мы создадим репозитории для обоих entity: link:../../spring-security-learning/src/main/java/ch3_database/sn1_test_deletion_hibernate/repository/PostRepository.java[PostRepository.java] и link:../../spring-security-learning/src/main/java/ch3_database/sn1_test_deletion_hibernate/repository/CommentRepository.java[CommentRepository.java].
+
+==== Ситуация 1 - сохраняем Comment отдельно через репозиторий
+
+Посмотрим на наш контроллер - link:../../spring-security-learning/src/main/java/ch3_database/sn1_test_deletion_hibernate/controller/PostController.java[PostController.java] (вариант 1):
+
+[source, java]
+----
+@RestController
+public class PostController {
+
+  @Autowired
+  private PostRepository postRepository;
+
+  @Autowired
+  private CommentRepository commentRepository;
+
+  @GetMapping("/createPost")
+  public void createPost() {
+    Post post = new Post();
+    post.setId(UUID.randomUUID());
+    post.setExternalId(UUID.randomUUID().toString());
+    post.setContent("content_" + post.getExternalId());
+    postRepository.save(post); // сохраняем Post сразу
+    // не добавляя Comment ему в Post.comments список
+
+    Comment comment = new Comment();
+    comment.setId(UUID.randomUUID());
+    comment.setExternalId(UUID.randomUUID().toString());
+    comment.setContent("comment_" + comment.getExternalId());
+    // сохраняем Comment отдельно, добавляя ему Post entity в @ManyToOne связь
+    comment.setPost(post);
+
+    post.setComments(new HashSet<>());
+    post.getComments().add(comment);
+
+
+    // если сохранять и comment и post - через commentRepository.save(comment) - то проблем вообще не должно быть
+    // только если мы начинаем сохранять только post и не делаем comment.setPost(post)
+    // только тогда возникают проблемы.
+    // а так можно и просто postRepository.save(post) вызвать, не сохраняя comment отдельно
+    // если сделать comment.setPost(post)
+    postRepository.save(post);
+//    commentRepository.save(comment);
+
+  }
+}
+----
+Если делать как в этом варианте - сохранять и _Comment_ и _Post_ - через `commentRepository.save(comment)` - то проблем вообще никаких. Несмотря на то, что мы не добавляем экземпляр _Comment_ в список `comments` экземпляра _Post_ - при последующем запросе экземпляра _Post_ через контроллер мы увидим, что у него список `comments` непустой - туда добавился сохранённый экземпляр. Т. е. в этом случае Hibernate само обработало этот момент и добавила вторую часть bidirectional link без нашего участия - но это потому, что мы сохраняли _Comment_ и _Post_ отдельно каждый через свой репозиторий.
+
+==== Ситуация 2 - сохраняем только через PostRepository Post вместе с Comment
+
+Вариантов целых три, но только один из них правильный:
+
+- *_Вариант 1_* - не делать `comment.setPost(post)`. Тогда получим exception: +
+----
+org.hibernate.PropertyValueException
+not-null property references a null or transient value ...Comment.post
+----
+
+[source, java]
+----
+public void createPost() {
+  Post post = new Post();
+  // ... omitted code
+
+  Comment comment = new Comment();
+  // ... omitted code
+
+  // --> exception
+  // comment.setPost(post);
+  post.setComments(new HashSet<>());
+  post.getComments().add(comment);
+  postRepository.save(post);
+}
+----
+
+- *_Вариант 2_* - не добавлять _comment_ в список _Post.comments_. Тогда exception не будет, но comment не сохранится в БД и список _Post.comments_ будет пустым.
+
+[source, java]
+----
+public void createPost() {
+  Post post = new Post();
+  // ... omitted code
+
+  Comment comment = new Comment();
+  // ... omitted code
+
+  comment.setPost(post);
+  // --> comment не сохранится в БД
+  // post.setComments(new HashSet<>());
+  // post.getComments().add(comment);
+  postRepository.save(post);
+}
+----
+
+- *_Вариант 3_* - добавить _comment_ в список _Post.comments_ и поставить `comment.setPost(post)`. Только этот вариант - правильный.
+
+[source, java]
+----
+public void createPost() {
+  Post post = new Post();
+  // ... omitted code
+
+  Comment comment = new Comment();
+  // ... omitted code
+
+  comment.setPost(post);
+  // --> РАБОТАЕТ
+  post.setComments(new HashSet<>());
+  post.getComments().add(comment);
+  postRepository.save(post);
+}
+----
