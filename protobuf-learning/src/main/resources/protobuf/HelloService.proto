@@ -1,0 +1,21 @@
+// какой синтаксис использует этот protobuf-файл
+syntax = "proto3";
+// По умолчанию компилятор создает весь код Java в одном файле Java.
+// Поэтому мы переопределяем параметр 'java_multiple_files',
+// то есть все будет создано в отдельных файлах.
+option java_multiple_files = true;
+// package where generated java files will be placed
+package protobuf_generated;
+
+message HelloRequest {
+  string firstName = 1;
+  string lastName = 2;
+}
+
+message HelloResponse {
+  string greeting = 1;
+}
+
+service HelloService {
+  rpc hello(HelloRequest) returns (HelloResponse);
+}
