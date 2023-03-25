@@ -108,6 +108,24 @@ image:img/generated_protobuf_java.png[]
 
 Работа по обмену сообщениями возлагается на client - link:../../protobuf-learning/src/main/java/client/GrpcClient.java[GrpcClient.java] и на server - link:../../protobuf-learning/src/main/java/server/GrpcServer.java[GrpcServer.java] и link:../../protobuf-learning/src/main/java/server/HelloServiceImpl.java[HelloServiceImpl.java].
 
+Запустим GrpcServer и после него - GrpcClient:
+
+- логи GrpcClient:
+----
+Sending to server: firstName: "Baeldung"
+lastName: "gRPC"
+
+Response received from server:
+greeting: "Hello, Baeldung gRPC"
+----
+
+- логи GrpcServer:
+----
+Request received from client:
+firstName: "Baeldung"
+lastName: "gRPC"
+----
+
 gRPC имеет несколько преимуществ:
 
 - Разработать API с широким набором операций обновления несложно.
