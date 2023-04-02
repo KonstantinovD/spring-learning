@@ -1,0 +1,68 @@
+== GLOBAL NOTE
+
+=== 02/04/2023
+
+- JVM - Java memory model +
+* link:https://proselyte.net/jvm-basics/[про jvm - Heap, Stack, MetaSpace, Native Method Stacks, String Pool; Garbage Collector - 4 types, JNI - java native] +
+* link:https://stackoverflow.com/questions/50163218/is-method-area-still-present-in-java-8[Meta Space встроена в Method area - это логическая концепция а не прямая реализация, на различиях можно не зацикливаться] +
+* link:https://www.baeldung.com/string/intern#:~:text=intern(),-Last%20modified%3A%20September&text=The%20method%20intern()%20creates,point%20to%20the%20other%20String.[String.intern()] и link:https://www.baeldung.com/java-string-pool[String pool]
+
+- Феномены чтения в БД +
+* link:https://proselyte.net/read-phenomena/[]
+* link:https://www.postgresql.org/docs/current/transaction-iso.html[Read Committed - default PG iso level] - два одинаковых Select в одной транзакции могут видеть разные результаты
+* link:https://stackoverflow.com/questions/11043712/what-is-the-difference-between-non-repeatable-read-and-phantom-read[non repeatable read vs phantom read] - в рамках одной транзакции первая аномалия может считать разные значения одной и той же строки, а у второй значения строк будут одинаковыми, но количество строк может меняться (строки удалились или добавились)
+
+- Hibernate - производительность, _FetchType.EAGER_
+ * link:https://vladmihalcea.com/eager-fetching-is-a-code-smell/[Eager fetching is a code smell - even in @ManyToOne] - по факту говорится что зачастую EAGER вам так просто не нужен (если только вы не собираетесь постоянно извлекать зависимый объект в _@ManyToOne_ или что-то подобное)
+* link:https://thorben-janssen.com/hibernate-performance-tuning/[Hibernate performance tuning] - org.hibernate.stat=DEBUG для логирования
+* link:https://proselyte.net/hibernate-caching-basics/[Кеширование в hibernate] - подчеркивается, что для _кэша запросов_ необходимо включать _кеш второго уровня_ - а также ссылки на: +
+1) стратегии кэша второго уровня - +
+link:https://www.baeldung.com/hibernate-second-level-cache#cacheConcurrencyStrategy[baelding - cacheConcurrencyStrategy] +
+2) Еще одну статью на link:https://habr.com/ru/post/135176/[habr] про кеширование - но самая первая лучше
+* link:https://javastudy.ru/interview/jee-hibernate-questions-answers/#:~:text=Session)%20%E2%80%94%20%D0%BE%D0%B4%D0%BD%D0%BE%D0%BF%D0%BE%D1%82%D0%BE%D1%87%D0%BD%D1%8B%D0%B9%20%D0%BA%D0%BE%D1%80%D0%BE%D1%82%D0%BA%D0%BE%D0%B6%D0%B8%D0%B2%D1%83%D1%89%D0%B8%D0%B9%20%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82%2C,sql.[что такое Session в Hibernate] - *_Session_* (_org.hibernate.Session_) — однопоточный короткоживущий объект, который предоставляет связь между объектами приложения и базой данных. Он оборачивает _JDBC_ _java.sql.**Connection**_ и работает как фабрика для _org.hibernate.**Transaction**_. Жизненный цикл объекта session связан с началом и окончанием транзакции. Экземпляр Session является интерфейсом между кодом в java приложении и Hibernate framework и предоставляет методы для операций CRUD. Существует еще один метод, link:https://javastudy.ru/interview/jee-hibernate-questions-answers/[openStatelessSession()], который возвращает session без поддержки состояния.
+
+- Hinernate
+* Hibernate questions - link:https://javastudy.ru/interview/jee-hibernate-questions-answers/[part1] и link:https://javastudy.ru/interview/jee-hibernate-questions-answers-2/[part2]
+* link:https://sysout.ru/tipy-cascade-primer-na-hibernate-i-spring-boot/[cascade types] и вообще много полезного - transaction propagation, orphanRemoval и т. д. +
+Кстати о link:https://sysout.ru/transaction-propagation/[transaction propagation] - а также смотри таблицу:
+
+*_паттерн_*
+
+- код выполняется вне транзакции (режим Auto-Commit)
+- [green]#одна транзакция#
+- [blue]#две транзакции#
+- [red]#исключение#
+
+[cols="1,2,2"]
+|===
+|
+|Вызов из *_@Transactional_* метода
+|Вызов из *_non-@Transactional_* метода
+
+|*_REQUIRED_*
+|[green]#используется существующая транзакция#
+|[green]#транзакция создается#
+
+|*_REQUIRED_NEW_*
+|[blue]#создается отдельная вторая транзакция для внутреннего метода#
+|[green]#транзакция создается#
+
+|*_SUPPORTS_*
+|[green]#используется существующая транзакция#
+|транзакция не создается
+
+|*_NOT_SUPPORTED_*
+|существующая транзакция не используется, код выполняется вне транзакции
+|транзакция не создается
+
+|*_NEVER_*
+|[red]#выбрасывает исключение#
+|транзакция не создается
+
+|*_MANDATORY_*
+|[green]#используется существующая транзакция#
+|[red]#выбрасывает исключение#
+|===
+
+- Hibernate - continue
+* link:https://itecnote.com/tecnote/hibernate-how-to-disable-automatic-saving-of-dirty-objects/[Hibernate втоматически сохраняет объекты] и link:https://itecnote.com/tecnote/java-when-hibernate-flushes-a-session-how-does-it-decide-which-objects-in-the-session-are-dirty/[Как Hibernate решает, что объекты, взятые из базы, стали "грязными" и их надо сохранить]. И link:https://itecnote.com/tecnote/java-prevent-hibernate-session-from-flushing-storing-invalid-dirty-entities/[как не сохранять Dirty entities - просто используйту entityManager.detach()]
