@@ -12,4 +12,4 @@ private Set<Book> books;
 
 - [JC] *_Hashcode_* - Возвращает int, в теории может быть и негативным, но на практике такого обычно нет. По дефолту возвращает адрес объекта в памяти, поэтому объекты по дефолту имеют разный хэшкод.
 - [JC] *_String hashcode_* - хэшкод стринга кэшируется, поэтому они очень удобны в качестве ключей.
-- Дефолтный FetchType: *_FetchType.LAZY_* (для @ManyToMany, @ManyToOne, etc)
+- Дефолтный FetchType: *_FetchType.LAZY_* (для @ManyToMany, @ManyToOne - для @OneToMany, @OneToOne дефолтный - *_FetchType.EAGER_*)
