@@ -4,7 +4,7 @@
 === MySQL vs Postgres
 
 - *Repeatable Read* - дефолтный isolation level в MySQL
-- *Read Committed* - дефолтный isolation level в PostgreSQL
+- *Read Committed* - дефолтный isolation level в PostgreSQL - т е два одинаковых Select в одной транзакции могут видеть разные результаты.
 
 === Ошибки чтения в БД
 
