@@ -14,7 +14,8 @@ link:https://inponomarev.github.io/java-mipt/slides05/#/_комбинирова�
 - Persistence context в Hibernate +
 link:http://akorsa.ru/2016/07/rukovodstvo-dlya-nachinayushhih-po-perehody-mezhdu-sostoyaniyami-v-jpa-hibernate/[]
 - Optimism/pessimistic blocks link:https://habr.com/ru/post/268903/[] (hibernate), and link:https://intellect.icu/blokirovka-subd-pessimisticheskaya-optimisticheskaya-sovmestnaya-isklyuchitelnaya-strochnaya-granulyarnaya-4723[]
-- Java study (вопросы и ответы, см spring-learning)  link:https://javastudy.ru/category/interview/page/3/[]
+- Java study (вопросы и ответы, см spring-learning)  link:https://javastudy.ru/category/interview/page/3/[], itsobes.ru - link:link:https://itsobes.ru/JavaSobes/kak-ustroeny-atomiki/[]
+- Про атомики - link:https://itsobes.ru/JavaSobes/kak-ustroeny-atomiki/[itsobes.ru]
 - Immutable object link:https://www.baeldung.com/java-immutable-object[]
 - Try with resources link:https://www.baeldung.com/java-try-with-resources[]
 - Stream API link:https://habr.com/ru/post/437038/[] and link:https://habr.com/ru/post/337350/[]
