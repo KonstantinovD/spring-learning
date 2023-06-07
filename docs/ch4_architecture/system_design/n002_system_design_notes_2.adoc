@@ -1,0 +1,82 @@
+= System Design Notes 2
+
+- link:#cap-theorem[CAP Theorem] +
+- link:#consistency-patterns[Шаблоны согласованности] +
+- link:#availability-parallel-sequential[Доступность параллельно или последовательно] +
+- link:#DNS[DNS - Domain name system] +
+- link:#CDN[CDN - Content delivery network] +
+- link:#load-balancer[Load balance] +
+- link:#reverse-proxy[Reverse proxy (Обратный прокси) web server] +
+- link:#application-layer[Application layer] +
+- link:#databases[Реляционные базы данных] +
+
+
+
+== Github system-design-primer
+link:https://github.com/donnemartin/system-design-primer/tree/master#system-design-topics-start-here[link github]
+
+- CAP Theorem - link:https://github.com/donnemartin/system-design-primer/tree/master#cap-theorem[link] [[cap-theorem]] +
+Network ненадежен поэтому P - обязательно! Выбираем между AP/CP. +
+* CP - непротиворечивость и устойчивость к разделам. +
+Ожидание ответа от разделенного узла может привести к ошибке тайм-аута. CP — хороший выбор, если вашему бизнесу требуются атомарные операции чтения и записи. +
+* AP — доступность и устойчивость к разделам +
+Возвращается наиболее доступная версия данных. Для распространения записи по всем узлам нужно время. Согласованность в конечном счёте - eventual consistency
+
+- Шаблоны согласованности - варианты их синхронизации - link:https://github.com/donnemartin/system-design-primer/tree/master#consistency-patterns[link] [[consistency-patterns]]
+* *_Weak consistency_* - после записи чтение может увидеть последние изменения, а может и не увидеть. Используется подход "наилучшая производительность". Слабая согласованность хорошо работает в случаях использования в реальном времени, таких как телефонная связь (при восстановлении соединения вы не слышите то что пропустили), видеочат и многопользовательские игры в реальном времени.
+* *_Eventual consistency_* - после записи чтение в конце концов увидит последние изменения (обычно в течение миллисекунд). Данные реплицируются асинхронно.
+* *_Strong consistency_* - После записи чтение увидит это. Данные реплицируются синхронно. Строгая согласованность - характерна для РСУБД и файловых систем.
+
+- Доступность параллельно или последовательно - link:https://github.com/donnemartin/system-design-primer/tree/master#availability-in-parallel-vs-in-sequence[link] [[availability-parallel-sequential]].
+* Общая доступность снижается, когда два компонента с доступностью < 100 % расположены последовательно.
+* Общая доступность увеличивается, когда два компонента с доступностью < 100 % работают параллельно.
+
+- DNS - Domain name system - link:https://github.com/donnemartin/system-design-primer/tree/master#domain-name-system[link] [[DNS]] +
+image:img/dns_schema.jpg[] +
+DNS сервера иерархичны, с несколькими "авторитетными" root-серверами на верхнем уровне. Низкоуровневые DNS кешируют ответы от root-серверов. Результаты DNS также могут кэшироваться браузером. +
+Недостатки DNS: сложное управление, ddos-атаки, минимальная но все таки задержка (которую можно уменьшить через кеширование). +
+Сервисы DNS могут направлять трафик различными способами:
+* *_Weighted round robin_* -> не пускает на maintenance servers, баланс между размерами кластера, позволяет A/B testing.
+* *_Latency-based_* (на основе задержки)
+* *_Geolocation-based_*
+
+- CDN - Content delivery network - link:https://github.com/donnemartin/system-design-primer/tree/master#content-delivery-network[link] [[CDN]] +
+image:img/cdn_schema.jpg[] +
+Глобально распределенная сеть прокси-серверов, для доставки контента в места, расположенные ближе к пользователю. Для этих мест вы переписываете URL-адреса, чтобы они указывали на CDN. Есть два типа CDN - push и pull.
+* Push CDN - вы сами кладете в CDN нужный вам контент. Сайты с небольшим объемом трафика или контентом, который не часто обновляется, хорошо работают с push CDN. Контент размещается в CDN один раз, а не извлекается через регулярные промежутки времени.
+* Pull CDN - сами запрашивают новый контент с вашего сервера, когда первый пользователь запрашивает контент. Если TTL истёк а пришел юзер за контентом то CDN опять запрашивает контент. Могут генерить избыточный трафик.
+
+- Load balancer - link:https://github.com/donnemartin/system-design-primer/tree/master#load-balancer[link] [[load-balancer]] +
+Дополнительно к балансировке load balancer может:
+* *_Управлять SSL_* - дешифровать входящий траффик и шифровать исходящий.
+* *_Сохранять Session_* - но это плохо если скейлим балансеры. Лучше хранить сессии в кеше к которому будут обращаться балансеры.
+Балансировщики нагрузки могут маршрутизировать трафик на основе различных показателей, в том числе:
+* Random
+* Least loaded
+* Session/cookies (stucked)
+* Round robin or weighted round robin
+
+- Reverse proxy (Обратный прокси) web server - link:https://github.com/donnemartin/system-design-primer/tree/master#reverse-proxy-web-server[link] и больше про link:https://www.nginx.com/resources/glossary/reverse-proxy-vs-load-balancer/[reverse-proxy VS load-balancer] [[reverse-proxy]] +
+image:img/reverse-proxy-web-server.png[]
+
+- Application layer - link:https://github.com/donnemartin/system-design-primer/tree/master#application-layer[link] [[application-layer]] +
+image:img/application-layer.png[] +
+Отделение web-layer от application layer (platform layer) позволяет независимо масштабировать и настраивать оба уровня. Добавление нового API приводит к добавлению application servers без обязательного добавления дополнительных web servers. +
+Такие системы, как _Consul_, _Etcd_, and _Zookeeper_ выполняют маршрутизацию на основе зарегистрированных names/addresses/ports. И Consul, и Etcd имеют встроенное key-value store которое может хранить значения конфигурации и другие общие данные.
+
+- Реляционные базы данных - link:https://github.com/donnemartin/system-design-primer/tree/master#database[link] [[databases]] +
+Существует множество методов масштабирования реляционной базы данных: репликация *_master-slave_*, репликация *_master-master_*, *_федерация_*, *_шардирование_*, *_денормализация_* и *_настройка SQL_*.
+* *_Репликация master-slave_* - master обслуживает чтение и запись, реплицируя запись на один или несколько slave, которые обслуживают только чтение. Если master отключается, система становится read-only до тех пор, пока slave не повысят до master или пока не будет создан новый master.
+* *_Репликация мастер-мастер_* - Оба мастера выполняют операции чтения и записи и координируют друг с другом операции записи. Если один из мастеров выходит из строя, система может продолжать работать как с чтением, так и с записью. +
+_Недостатки_: Вам понадобится балансировщик нагрузки. Также либо будет weak consistency, либо задержка записи из-за синхронизации. Также придется разрешать конфликты (см. "векторные часы"). +
+image:img/master-master.png[] +
+* *_Федерация_* - разделяет базы данных по функциям. Например, вместо единой монолитной базы данных у вас может быть три базы данных: forums, users, and products, что приведет к уменьшению трафика чтения и записи в каждую базу данных. Меньшие базы данных -> больше данных в памяти, -> больше попаданий в кэш из-за локальности кэша. +
+_Недостатки_: Join неэффективен. Логика приложения сложна. +
+image:img/federation.png[]
+* *_Шардинг_* - ну тут все понятно :)
+* *_Денормализация_*
+
+
+
+
+
