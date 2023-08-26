@@ -20,18 +20,21 @@ This project is used for in-depth study of Spring Framework.
 │   │
 │   ├── ch4_architecture                       [общие записки об архитектуре приложений]
 │   │   │
-│   │   ├── system_design [system-design-primer, Alex Xu]
-│   │   ├── ... [заметки из книги Microservices Patterns: With Examples in Java]
+│   │   ├── system_design (system-design-primer, Alex Xu)
+│   │   ├── ... (заметки из книги 
+                 Microservices Patterns: With Examples in Java)
 │   │
 │   ├── ch5_spring_security_in_action          [Spring Security In Action]
 │   │   ├── ...
 │   │
 │   ├── notes                                  [общие заметки]
 │   │   │
-│   │   ├── ... [Hibernate, ParallelStream, Generics, etc]
+│   │   ├── ... (Hibernate, ParallelStream, Generics, etc)
 │   │   ├── ... links_to_resources.adoc
 │   │   ├── ... VisualVM.adoc
-│   │   ├── ... GLOBAL_NOTE.adoc [феномены чтения в БД, Java memory model, Hibernate transaction propagation]
+│   │   ├── ... GLOBAL_NOTE.adoc (феномены чтения в БД, 
+                                  Java memory model, 
+                                  Hibernate transaction propagation)
 │   │
 │   ├── spring                                  [Книга Spring for Professionals + отдельные SNippets] 
 │   │   ├── ...
@@ -40,24 +43,27 @@ This project is used for in-depth study of Spring Framework.
 ### Кодовая база
 
 ```text
-├── custom-spring-security-auth-server [не работает]
+├── custom-spring-security-auth-server           [не работает]
 │
-├── protobuf-learning [пример protobuf, без документации]
+├── protobuf-learning                            [пример protobuf, без документации]
 │
-├── spring-learning-src
+├── spring-learning-src                          [Spring, plain Java]
 │   │
-│   ├── book (Книга 'Spring for Professionals' + отдельные Snippets)
-│   ├── ch2_plain_java (java заметки и примеры, большинство без доков)
+│   ├── book (Книга 'Spring for Professionals' 
+              и отдельные Snippets)
+│   ├── ch2_plain_java (java заметки и примеры, 
+                        большинство без доков)
 │   ├── testing (мусор)
 │   │
-├── spring-security-learning
+├── spring-security-learning                     [spring security & H2/hibernate]
 │   │
 │   ├── ch3_database (играем с H2 и hibernate/jpa)
-│   ├── ch5_spring_security_in_action (Книга 'Spring Security In Action')
+│   ├── ch5_spring_security_in_action 
+        (Книга 'Spring Security In Action')
 │
-├── spring-security-oauth2-second-auth-server [не работает]
+├── spring-security-oauth2-second-auth-server    [не работает]
 │
-├── src [дубликат spring-learning-src]
+├── src                                          [дубликат spring-learning-src]
 ```
 
 ### Соответствующие ссылки на код
