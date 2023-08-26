@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean id="customEditorConfigurer"
+          class="org.springframework.beans.factory.config.CustomEditorConfigurer"
+          p:propertyEditorRegistrars-ref="propertyEditorRegistrarsList"/>
+    <util:list id="propertyEditorRegistrarsList">
+        <bean class="book.p239_property_editors.PropertyEditorBean$CustomPropertyEditorRegistrar"/>
+    </util:list>
+
+    <util:list id="stringList">
+        <value>String memЬer 1</value>
+        <value>String memЬer 2</value>
+    </util:list>
+
+    <bean id="builtInSample"
+          class="book.p239_property_editors.PropertyEditorBean"
+          p:character="A"
+          p:bytes="John Mayer"
+          p:cls="java.lang.String"
+          p:trueOrFalse="true"
+          p:stringList-ref="stringList"
+          p:floatValue="123.45678"
+          p:date="05/03/2022"
+          p:file="#{systemProperties['java.io.tmpdir']}#{systemProperties['file.separator']}test.txt"
+          p:locale="en_US"
+          p:pattern="a*b"
+          p:properties="name=Chris age=32"
+          p:trimString=" String need trimming "
+          p:url="https://spring.io/"/>
+
+</beans>

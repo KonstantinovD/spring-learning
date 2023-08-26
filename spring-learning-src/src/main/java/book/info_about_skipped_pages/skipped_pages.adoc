@@ -1,0 +1,11 @@
+
+- p150_method_replacing
+- p167_bean_scopes_n_usage *_[adoc]_*
+- p251_internationalization_i18n_via_MessageSource
+- p260_ctx_getResource
+- 262_configuring_beans_via_java
+- 284 Абстракция через интерфейсы Environment и PropertySource
+- 290 Конфигурирование с помощью аннотаций JSR-330
+- 295 Конфигурирование средствами Groovy
+- 593 Отслеживание изменений в entity-классе
+- 606 Отслеживание версий сущностей средствами Hibernate Envers
