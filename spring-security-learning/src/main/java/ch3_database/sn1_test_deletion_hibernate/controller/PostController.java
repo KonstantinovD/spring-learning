@@ -35,7 +35,7 @@ public class PostController {
     comment.setId(UUID.randomUUID());
     comment.setExternalId(UUID.randomUUID().toString());
     comment.setContent("comment_" + comment.getExternalId());
-//    comment.setPost(post);
+    comment.setPost(post);
 
     post.setComments(new HashSet<>());
     post.getComments().add(comment);
