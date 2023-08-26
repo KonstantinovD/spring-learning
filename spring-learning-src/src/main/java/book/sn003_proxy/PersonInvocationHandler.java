@@ -1,4 +1,4 @@
-package ch2_plain_java.sn1_proxy;
+package book.sn003_proxy;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

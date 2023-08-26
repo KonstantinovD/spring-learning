@@ -1,4 +1,4 @@
-package sn1_fork_join_pool;
+package ch2_plain_java.sn1_fork_join_pool;
 
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;

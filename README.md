@@ -4,9 +4,66 @@ This project is used for in-depth study of Spring Framework.
 
 ## Structure
 
+### docs
+Основное хранилище всех записей, ссылок и документирования.
 
+```text
+├── docs
+│   ├── sh2_plain_java                         [некоторые примеры + вопросы с собесов]
+│   │   │
+│   │   ├── questions.adoc
+│   │   ├── sn3_functional_interfaces.adoc
+│   │   ├── sn9_concurrent.adoc
+│   │
+│   ├── sh3_database                           [заметки о БД]
+│   │   ├── sn1_sharding.adoc
+│   │
+│   ├── ch4_architecture                       [общие записки об архитектуре приложений]
+│   │   │
+│   │   ├── system_design [system-design-primer, Alex Xu]
+│   │   ├── ... [заметки из книги Microservices Patterns: With Examples in Java]
+│   │
+│   ├── ch5_spring_security_in_action          [Spring Security In Action]
+│   │   ├── ...
+│   │
+│   ├── notes                                  [общие заметки]
+│   │   │
+│   │   ├── ... [Hibernate, ParallelStream, Generics, etc]
+│   │   ├── ... links_to_resources.adoc
+│   │   ├── ... VisualVM.adoc
+│   │   ├── ... GLOBAL_NOTE.adoc [феномены чтения в БД, Java memory model, Hibernate transaction propagation]
+│   │
+│   ├── spring                                  [Книга Spring for Professionals + отдельные SNippets] 
+│   │   ├── ...
+```
 
-## Useful links
+### Кодовая база
 
-- _**@Lazy**_ annotation [link](https://coderlessons.com/articles/java/spring-lazy-annotatsii-varianty-ispolzovaniia)
-- How does _**singleton**_ bean serve _**multiple requests**_ at the same time in Spring? [link](https://medium.com/@hasanli.vusala.73/how-does-singleton-bean-serve-multiple-requests-at-the-same-time-in-spring-f4c9d797dec9)
+```text
+├── custom-spring-security-auth-server [не работает]
+│
+├── protobuf-learning [пример protobuf, без документации]
+│
+├── spring-learning-src
+│   │
+│   ├── book (Книга 'Spring for Professionals' + отдельные Snippets)
+│   ├── ch2_plain_java (java заметки и примеры, большинство без доков)
+│   ├── testing (мусор)
+│   │
+├── spring-security-learning
+│   │
+│   ├── ch3_database (играем с H2 и hibernate/jpa)
+│   ├── ch5_spring_security_in_action (Книга 'Spring Security In Action')
+│
+├── spring-security-oauth2-second-auth-server [не работает]
+│
+├── src [дубликат spring-learning-src]
+```
+
+### Соответствующие ссылки на код
+* sh2_plain_java -> [spring-learning-src/.../ch2_plain_java](spring-learning-src/src/main/java/ch2_plain_java)
+* sh3_database -> [NO CODE]()
+* ch4_architecture -> [NO CODE]()
+* ch5_spring_security_in_action -> [spring-security-learning/.../ch5_spring_security_in_action](spring-security-learning/src/main/java/ch5_spring_security_in_action)
+* notes -> [sn12_strings и sn11_generics](spring-learning-src/src/main/java/ch2_plain_java)
+* spring -> [book](spring-learning-src/src/main/java/book) и [spring-security-learning/.../ch3_database](spring-security-learning/src/main/java/ch3_database)
