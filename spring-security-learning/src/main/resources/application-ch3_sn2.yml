@@ -1,0 +1,46 @@
+spring:
+  datasource:
+    url: jdbc:h2:file:C:/Users/d.m.konstantinov/DRIVE/PROJECTS/my_own_projects/embedded-db/transactions-sn2
+    username: sa
+    password: password
+    auto-commit: false
+    hikari:
+      maximum-pool-size: 4
+      connection-timeout: 5000
+      validation-timeout: 2000
+      leak-detection-threshold: 300000
+      pool-name: HikariPool-SL
+  jpa:
+    properties:
+      hibernate:
+        jdbc.batch_size: 100
+        order_inserts: true
+        order_updates: true
+        batch_versioned_data: true
+        connection:
+          autocommit: false
+  liquibase:
+    change-log: classpath:db/db-changelog-sn02.yaml
+  h2:
+    console:
+      enabled: true
+
+logging:
+  level:
+    liquibase: INFO
+hibernate:
+  connection:
+    autocommit: false
+
+
+
+
+
+
+# spring.datasource.url=jdbc:h2:file:C:/Users/d.m.konstantinov/DRIVE/PROJECTS/my_own_projects/embedded-db/transactions-sn2;AUTOCOMMIT=OFF
+# spring.datasource.username=sa
+# spring.datasource.password=password
+
+my-config:
+  test: '12'
+

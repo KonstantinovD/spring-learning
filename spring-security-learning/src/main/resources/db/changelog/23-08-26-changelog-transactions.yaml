@@ -1,0 +1,75 @@
+databaseChangeLog:
+  - changeSet:
+      id: test_table_liquibase_migration
+      author: KonstantinovD
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+          - tableExists:
+              tableName: test_table
+      changes:
+        - createTable:
+            tableName: test_table
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: test_table_pk
+              - column:
+                  name: name
+                  type: varchar(30)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: text
+                  type: varchar(255)
+        - createSequence:
+            sequenceName: s_test_table
+        - addDefaultValue:
+            tableName: test_table
+            columnName: id
+            defaultValueSequenceNext: s_test_table
+#        - addUniqueConstraint:
+#            columnNames: name
+#            constraintName: test_table_u1
+#            tableName: test_table
+  - changeSet:
+      id: test_table_init
+      author: KonstantinovD
+      changes:
+        - insert:
+            tableName: test_table
+            columns:
+              - column:
+                  name: id
+                  valueSequenceNext: s_test_table
+              - column:
+                  name: name
+                  value: ELEMENT_1
+              - column:
+                  name: text
+                  value: Nothing
+        - insert:
+            tableName: test_table
+            columns:
+              - column:
+                  name: id
+                  valueSequenceNext: s_test_table
+              - column:
+                  name: name
+                  value: ELEMENT_2
+        - insert:
+            tableName: test_table
+            columns:
+              - column:
+                  name: id
+                  valueSequenceNext: s_test_table
+              - column:
+                  name: name
+                  value: ELEMENT_3
+              - column:
+                  name: text
+                  value: Something

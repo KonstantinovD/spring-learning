@@ -1,0 +1,67 @@
+== Транзакция, открытая внутри второй транзакции (из рабочего опыта)
+
+*Content:*
+
+- 1. Введение в транзакции
+- 2. Внутренняя транзакция
+- 3. Внутренняя транзакция и блокировки строк
+
+=== 1. Введение в транзакции
+
+В целом, в обычном использовании транзакций больших сложностей нет. Главное - не забывать некоторые ключевые вещи:
+
+- 1) НЕ ВЫЗЫВАЙТЕ ТРАНЗАКЦИОННЫЙ МЕТОД ПРОСТО ТАК ИЗ ТОГО ЖЕ КЛАССА! У вас не будут работать прокси. Для таких вызовов используйте `TransactionTemplate`.
+
+=== 2. Внутренняя транзакция
+
+Транзакции фиксируют изменения в БД. Пусть у нас есть танзакция А, и внутри нее мы вызвали транзакцию Б со следующей пропагацией:
+[source, java]
+----
+@Transactional(propagation = REQUIRES_NEW);
+----
+
+Либо же использовали `TransactionTemplate` для вызова транзакции в том же классе:
+[source, java]
+----
+TransactionTemplate transactionTemplate =
+    new TransactionTemplate(transactionManager);
+transactionTemplate.setPropagationBehavior(
+        TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+// вызов новой транзакции в том же классе
+transactionTemplate.execute(status -> {
+    // transaction logic - call method, etc
+    return null;
+});
+----
+
+Тогда мы создадим новую транзакцию внутри существующей. Причем, если транзакция Б завершится нормально, а транзакция А упадет, то все что будет сделано в транзакции Б - сохранится.
+
+See: link:../../spring-security-learning/src/main/java/spring/sn005_inner_transaction[sn005_inner_transaction/...]
+
+=== 3. Внутренняя транзакция и блокировки строк
+
+В ситуации выше получается очень интересный момент. Мы создаем абсолютно новую транзакцию. А все блокировки строк являются транзакционными - они существуют только в рамках одной транзакции. +
+Соответственно, если мы попытаемся изменить сущности, строки которых залочены во внешней транзакции, то получим локальный дедлок =)
+[source, java]
+----
+@Lock(LockModeType.PESSIMISTIC_WRITE)
+@QueryHints({ @QueryHint(
+        name = "javax.persistence.lock.timeout",
+value = SKIP_LOCKED + "") })
+@Transactional(propagation = Propagation.MANDATORY)
+List<TestNote> findByName(String name);
+----
+
+See: link:../../spring-security-learning/src/main/java/spring/sn005_inner_transaction[sn005_inner_transaction/...]
+[source, java]
+----
+org.h2.jdbc.JdbcSQLTimeoutException: Время ожидания блокировки таблицы {0} истекло
+Timeout trying to lock table {0}; SQL statement:
+update test_table set name=?, text=? where id=? [50200-200]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:511) ~[h2-1.4.200.jar:1.4.200]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:429) ~[h2-1.4.200.jar:1.4.200]
+	at org.h2.message.DbException.get(DbException.java:194) ~[h2-1.4.200.jar:1.4.200]
+	at org.h2.command.Command.filterConcurrentUpdate(Command.java:309) ~[h2-1.4.200.jar:1.4.200]
+----
+
+Данную проблему можно обойти через savepoints - не создавать внутреннюю новую транзакцию, а добиться сохранения части изменений внутри одной транзакции даже при откате всей транзакции... но об этом будем говорить позже.
