@@ -58,12 +58,35 @@ This project is used for in-depth study of Spring Framework.
 ├── spring-security-learning                     [spring security & H2/hibernate]
 │   │
 │   ├── ch3_database (играем с H2 и hibernate/jpa)
+│   ├── spring ('Spring for Professionals' примеры DB/SQL/JPA)
 │   ├── ch5_spring_security_in_action 
         (Книга 'Spring Security In Action')
 │
 ├── spring-security-oauth2-second-auth-server    [не работает]
 │
 ├── src                                          [дубликат spring-learning-src]
+```
+
+### Кодовая база без документации - обзор
+
+```text
+├── ch2_plain_java
+│   │
+│   ├── sn1_fork_join_pool
+│   ├── sn2_default_methods
+│   ├── sn3_functional_interfaces
+│   ├── sn4_threads_wait_notify
+│   ├── sn5_locks_with_conditions
+│   ├── sn6_constructors
+│   ├── sn7_static_nested_classes_q26_oop
+│   ├── sn8_reflection
+│   ├── sn9_concurrent
+│   │   ├── executorServiceExample/ExecutorServiceExample.java
+│   │   │   ...
+│   │   ├── ScheduledExecutorServiceExample.java
+│   ├── sn10_stackowerflow
+│   ├── sn11_generics
+│   ├── sn12_strings
 ```
 
 ### Соответствующие ссылки на код
