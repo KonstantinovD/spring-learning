@@ -27,6 +27,9 @@ This project is used for in-depth study of Spring Framework.
 │   ├── ch5_spring_security_in_action          [Spring Security In Action]
 │   │   ├── ...
 │   │
+│   ├── ch6_hibernate                          [Книга 'Java Persistence API и Hibernate']
+│   │   ├── ...
+│   │
 │   ├── notes                                  [общие заметки]
 │   │   │
 │   │   ├── ... (Hibernate, ParallelStream, Generics, etc)
@@ -44,6 +47,8 @@ This project is used for in-depth study of Spring Framework.
 
 ```text
 ├── custom-spring-security-auth-server           [не работает]
+│
+├── hibernate-learning                            [Книга 'Java Persistence API и Hibernate']
 │
 ├── protobuf-learning                            [пример protobuf, без документации]
 │
