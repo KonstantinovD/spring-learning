@@ -1,0 +1,59 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2023_09_08_p65_presisted_object_and_hibernate_properties
+      author: KonstantinovD
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: users
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: users_pk
+              - column:
+                  name: name
+                  type: varchar(255)
+        - createSequence:
+            sequenceName: s_users
+        - addDefaultValue:
+            tableName: users
+            columnName: id
+            defaultValueSequenceNext: s_users
+        - createTable:
+            tableName: notes
+            columns:
+              - column:
+                    name: id
+                    type: numeric
+                    constraints:
+                      nullable: false
+                      primaryKey: true
+                      primaryKeyName: notes_pk
+              - column:
+                  name: user_id
+                  type: numeric
+                  constraints:
+                    nullable: false
+              - column:
+                  name: text
+                  type: varchar(255)
+        - createSequence:
+            sequenceName: s_notes
+        - addDefaultValue:
+            tableName: notes
+            columnName: id
+            defaultValueSequenceNext: s_notes
+        - addForeignKeyConstraint:
+            constraintName: users_fk1
+            baseColumnNames: user_id
+            baseTableName: notes
+            referencedColumnNames: id
+            referencedTableName: users

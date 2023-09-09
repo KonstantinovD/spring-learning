@@ -1,0 +1,159 @@
+== Hibernate properties
+
+*Content:*
+
+- 1. POJO. Требования к persisted-классу
+- 2. Properties of entity
+- 3. Properties dirty checking
+- 4. Lazy-коллекции работают только внутри транзакций
+- 5. Обработка exceptions в properties
+
+=== 1. POJO. Требования к persisted-классу
+
+В Hibernate мы работаем с POJO:
+[source, java]
+----
+public class User {
+
+    protected String username;
+
+    public User() { }
+
+    public String getUsername() {
+        return username;
+    }
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    public BigDecimal calcShippingCosts(Address fromLocation) {
+        // Пустая реализация бизнес-метода
+        return null;
+    }
+    // ...
+}
+----
+
+*Требования к persisted-классу*
+
+1. Класс может быть абстрактным, расширять _non-persisted_ класс или реализовать интерфейс.
+2. Он должен быть классом верхнего уровня.
+3. Ни persisted классы, ни их методы не могут быть `final` (требование спецификации JPA).
+4. Persisted класс должен иметь конструктор без аргументов. Он вызывается для создания экземпляров через рефлексию. Конструктор должен быть как минимум package-область видимости, т. к. для оптимизации производительности Hibernate может использовать прокси-классы, сгенерированные во время выполнения.
+
+=== 2. Properties of entity
+
+Свойства entity - это либо сами члены класса, либо методы для доступа к ним (getter и setter). Имя getter-а должно начинаться с _'get'_, далее идет имя свойства, имя setter-а - начинаться с _'set'_ по аналогии. В setter-ах типа Boolean допускается вместо 'get' использовать префикс _'is'_. +
+Зачем нужны свойства? Если вы настроите Hibernate на доступ к атрибутам через методы, вы можете разделить члены класса и схему БД. Например, если имя пользователя хранится в базе данных в одном столбце NAME, но в классе User есть поля firstname и lastname, вы можете определить в классе хранимое свойство name: +
+*_See:_* link:../../hibernate-learning/src/main/java/ch6_hibernate/p65_presisted_object_and_hibernate_properties/User.java[User.java]
+[source, java]
+----
+@Entity
+@Table(name = "users")
+@Getter
+@Setter
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "s_users")
+    @SequenceGenerator(name = "s_users", sequenceName = "s_users", allocationSize = 1)
+    @Getter(AccessLevel.PROTECTED) // FYI, ломбоковские getter/setter
+    @Setter(AccessLevel.PROTECTED) // можно снабжать модификаторами доступа
+    private BigDecimal id;
+
+    @Transient // иначе hibernate ругается 'Столбец "USER0_.FIRST_NAME" не найден'
+    private String firstName;
+
+    @Transient // иначе hibernate ругается 'Столбец "USER0_.LAST_NAME" не найден'
+    private String lastName;
+
+    @EqualsAndHashCode.Exclude
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @BatchSize(size = 5)
+    private List<Note> notes;
+
+    @Access(AccessType.PROPERTY) // иначе не работает
+    public String getName() {
+        return firstName + ' ' + lastName;
+    }
+
+    @Access(AccessType.PROPERTY) // иначе не работает
+    public void setName(String name) {
+        StringTokenizer t = new StringTokenizer(name);
+        firstName = t.nextToken();
+        lastName = t.nextToken();
+    }
+
+    // ...
+}
+----
+
+=== 3. Properties dirty checking
+
+Еще один важный аспект в Hibernate - это сравнение состояния объектов (dirty checking). Hibernate автоматически определяет изменение состояния для синхронизации с базой данных. Как правило, entity может отдать из getter-а другой объект,а не тот, который Hibernate передал в setter. Hibernate сравнит их через *_equals_* чтобы выяснить, нужно ли обновлять состояние атрибута. Следующий метод, к примеру, не станет причиной ненужных SQL-выражений UPDATE:
+[source, java]
+----
+public String getFirstname() { // Это нормально
+    return new String(firstname);
+}
+----
+Но есть одно важное исключение – для коллекций проверяется идентичность! Для property, которая есть коллекция, getter должен возвращать ту же коллекцию, которая была засетана в setter Hibernate. В противном случае Hibernate будет обновлять базу данных, даже если никакого обновления не требуется, для синхронизации состояния в памяти и в базе данных. Обычно вы должны стараться избегать подобного кода в методах:
+[source, java]
+----
+protected String[] names = new String[0];
+
+public void setNames(List<String> names) {
+    this.names = names.toArray(new String[names.size()]);
+}
+
+public List<String> getNames() {
+    return Arrays.asList(names);
+}
+----
+
+Пример такого поведения - +
+*_See:_* link:../../hibernate-learning/src/main/java/ch6_hibernate/p65_presisted_object_and_hibernate_properties/UsersSchedulerService.java[UsersSchedulerService.testSettingNewCollection()]
+[source, java]
+----
+    private void testSettingNewCollection() {
+        User user = repository.findAll().get(0);
+        // добавляем notes и сохраняем
+        user.addNote("NOTE1");
+        user.addNote("NOTE2");
+        repository.saveAndFlush(user);
+
+        List<Map<String, Object>> notesInDb = jdbcTemplate.queryForList("select * from notes");
+        assertEquals(2, notesInDb.size());
+
+        // для коллекций проверяется идентичность - добавляются новые entities в базу
+        // хотя по факту entities внутри коллекции равны
+        user.setNotes(new ArrayList<>());
+        user.addNote("NOTE1");
+        user.addNote("NOTE2");
+        repository.saveAndFlush(user); // казалось, notes останется два...
+
+        List<Map<String, Object>> notesInDb2 = jdbcTemplate.queryForList("select * from notes");
+        // ... но нет :)
+        assertEquals(4, notesInDb2.size());
+        // если же сделать 'orphanRemoval = true' для удаления лишнего
+        // то получим следующий эксепшн:
+        // A collection with cascade="all-delete-orphan" was no longer referenced
+        // by the owning entity instance: User.notes
+        User savedEntity = repository.getById(user.getId());
+        assertEquals(4, savedEntity.getNotes().size()); // по факту всё добавилось
+    }
+----
+
+=== 4. Lazy-коллекции работают только внутри транзакций
+
+На link:../../hibernate-learning/src/main/java/ch6_hibernate/p65_presisted_object_and_hibernate_properties/UsersSchedulerService.java[UsersSchedulerService.process()] висит аннотация @Transactional. Всё дело в том, что без этого не будет работать lazy fetch type, и мы не сможем подтянуть список notes у User - будет Hibernate exception _"failed to lazily initialize a collection of role”_.
+
+Данное поведение описано на link:https://stackoverflow.com/questions/11746499/how-to-solve-the-failed-to-lazily-initialize-a-collection-of-role-hibernate-ex[stackoverflow] и на link:https://habr.com/ru/articles/271115/[habr]
+
+
+=== 5. Обработка exceptions в properties
+
+Как Hibernate обрабатывает исключения в getter/setter?
+
+- Если получили RuntimeException, Hibernate откатит текущую транзакцию, и вы сможете обработать исключение в коде.
+- Если получили checked exception, Hibernate обернет его в RuntimeException
+

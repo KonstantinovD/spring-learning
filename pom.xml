@@ -9,6 +9,7 @@
         <module>spring-security-oauth2-second-auth-server</module>
         <module>protobuf-learning</module>
         <module>spring-learning-src</module>
+        <module>hibernate-learning</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
