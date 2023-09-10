@@ -5,8 +5,9 @@
 - 1. POJO. Требования к persisted-классу
 - 2. Properties of entity
 - 3. Properties dirty checking
-- 4. Lazy-коллекции работают только внутри транзакций
-- 5. Обработка exceptions в properties
+- 4. Замена коллекции движком Hibernate через доступ к переменной-члену
+- 5. Lazy-коллекции работают только внутри транзакций
+- 6. Обработка exceptions в properties
 
 === 1. POJO. Требования к persisted-классу
 
@@ -106,7 +107,10 @@ public void setNames(List<String> names) {
 }
 
 public List<String> getNames() {
+    // Не делайте этого, если Hibernate обращается к методам доступа!
     return Arrays.asList(names);
+    // Однако это не является проблемой, если Hibernate обращается
+    // к 'names' непосредственно, без использования setter/getter
 }
 ----
 
@@ -143,14 +147,27 @@ public List<String> getNames() {
     }
 ----
 
-=== 4. Lazy-коллекции работают только внутри транзакций
+Однако это не является проблемой, если Hibernate обращается к переменной-члену names непосредственно, в обход методов доступа. Давайте рассмотрим, что это значит:
+
+=== 4. Замена коллекции движком Hibernate через доступ к переменной-члену
+
+Допустим, у нас есть коллекция Items, и мы разрешаем её модифицировать через методы _addItems()_ и _removeItems()_. Т. е. мы хотим запретить модифаить коллекцию через метод _getItems()_. Тогда мы настраиваем Hibernate на доступ к полям (работает по дефолту) и можем из метода возвращать unmodifiable коллекцию без рисков получить апдейт в базе как в ситуации выше:
+[source, java]
+----
+List<Items> getItems() {
+    return Collections.unmodifiableList(items);
+}
+----
+Коллекция, возвращаемая геттером, будет отличаться от переданной в сеттер. Но т. к. Hibernate работает с полями, это нам не помешает
+
+=== 5. Lazy-коллекции работают только внутри транзакций
 
 На link:../../hibernate-learning/src/main/java/ch6_hibernate/p65_presisted_object_and_hibernate_properties/UsersSchedulerService.java[UsersSchedulerService.process()] висит аннотация @Transactional. Всё дело в том, что без этого не будет работать lazy fetch type, и мы не сможем подтянуть список notes у User - будет Hibernate exception _"failed to lazily initialize a collection of role”_.
 
 Данное поведение описано на link:https://stackoverflow.com/questions/11746499/how-to-solve-the-failed-to-lazily-initialize-a-collection-of-role-hibernate-ex[stackoverflow] и на link:https://habr.com/ru/articles/271115/[habr]
 
 
-=== 5. Обработка exceptions в properties
+=== 6. Обработка exceptions в properties
 
 Как Hibernate обрабатывает исключения в getter/setter?
 

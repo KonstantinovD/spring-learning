@@ -73,7 +73,8 @@ public class UsersSchedulerService {
         // A collection with cascade="all-delete-orphan" was no longer referenced
         // by the owning entity instance: User.notes
         User savedEntity = repository.getById(user.getId());
-        assertEquals(4, savedEntity.getNotes().size()); // по факту всё добавилось
+        // сейчас только 2 объекта... но после транзакции будет 4
+        assertEquals(2, savedEntity.getNotes().size());
     }
 
 }
