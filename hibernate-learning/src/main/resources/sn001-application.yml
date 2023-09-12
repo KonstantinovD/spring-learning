@@ -1,9 +1,8 @@
 spring:
   datasource:
-    url: jdbc:h2:file:C:/Users/d.m.konstantinov/DRIVE/PROJECTS/my_own_projects/embedded-db/transactions-sn2
+    url: jdbc:h2:file:C:/Users/d.m.konstantinov/DRIVE/PROJECTS/my_own_projects/embedded-db/sn001-transactions
     username: sa
-    password: password
-    auto-commit: false
+    password: pass
     hikari:
       maximum-pool-size: 4
       connection-timeout: 5000
@@ -20,7 +19,7 @@ spring:
         connection:
           autocommit: false
   liquibase:
-    change-log: classpath:db/db-changelog-sn02.yaml
+    change-log: classpath:sn001-application/changelog.yaml
   h2:
     console:
       enabled: true
@@ -28,18 +27,6 @@ spring:
 logging:
   level:
     liquibase: INFO
-hibernate:
-  connection:
-    autocommit: false
-
-
-
-
-
-
-# spring.datasource.url=jdbc:h2:file:C:/Users/d.m.konstantinov/DRIVE/PROJECTS/my_own_projects/embedded-db/transactions-sn2;AUTOCOMMIT=OFF
-# spring.datasource.username=sa
-# spring.datasource.password=password
 
 my-config:
   test: '12'

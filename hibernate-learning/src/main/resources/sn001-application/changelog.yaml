@@ -5,8 +5,8 @@ databaseChangeLog:
       preConditions:
         - onFail: MARK_RAN
         - not:
-          - tableExists:
-              tableName: test_table
+            - tableExists:
+                tableName: test_table
       changes:
         - createTable:
             tableName: test_table
@@ -32,10 +32,10 @@ databaseChangeLog:
             tableName: test_table
             columnName: id
             defaultValueSequenceNext: s_test_table
-#        - addUniqueConstraint:
-#            columnNames: name
-#            constraintName: test_table_u1
-#            tableName: test_table
+  #        - addUniqueConstraint:
+  #            columnNames: name
+  #            constraintName: test_table_u1
+  #            tableName: test_table
   - changeSet:
       id: test_table_init
       author: KonstantinovD

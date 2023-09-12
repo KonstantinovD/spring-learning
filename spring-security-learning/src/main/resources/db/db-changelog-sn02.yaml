@@ -1,4 +1,0 @@
-databaseChangeLog:
-  - include:
-      relativeToChangelogFile: true
-      file: "changelog/23-08-26-changelog-transactions.yaml"

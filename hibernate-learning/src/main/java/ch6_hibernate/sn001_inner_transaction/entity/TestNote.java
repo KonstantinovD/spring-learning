@@ -1,4 +1,4 @@
-package spring.sn005_inner_transaction.entity;
+package ch6_hibernate.sn001_inner_transaction.entity;
 
 import lombok.Getter;
 import lombok.Setter;

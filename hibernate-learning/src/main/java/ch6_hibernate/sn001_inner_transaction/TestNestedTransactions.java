@@ -1,4 +1,4 @@
-package spring.sn005_inner_transaction;
+package ch6_hibernate.sn001_inner_transaction;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 public class TestNestedTransactions {
     public static void main(String[] args) {
-        System.setProperty("spring.config.name", "application-ch3_sn2");
+        System.setProperty("spring.config.name", "sn001-application");
         SpringApplication.run(TestNestedTransactions.class, args);
     }
 }

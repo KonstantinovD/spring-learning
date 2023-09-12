@@ -1,14 +1,14 @@
-package spring.sn005_inner_transaction.service;
+package ch6_hibernate.sn001_inner_transaction.service;
 
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.support.TransactionTemplate;
-import spring.sn005_inner_transaction.entity.TestNote;
-import spring.sn005_inner_transaction.repository.TestNoteRepository;
+import ch6_hibernate.sn001_inner_transaction.entity.TestNote;
+import ch6_hibernate.sn001_inner_transaction.repository.TestNoteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
 import java.util.UUID;

@@ -1,13 +1,13 @@
-package spring.sn005_inner_transaction.scheduler;
+package ch6_hibernate.sn001_inner_transaction.scheduler;
 
-import org.springframework.dao.PessimisticLockingFailureException;
-import spring.sn005_inner_transaction.entity.TestNote;
-import spring.sn005_inner_transaction.repository.TestNoteRepository;
-import spring.sn005_inner_transaction.service.TransactionService;
+import ch6_hibernate.sn001_inner_transaction.entity.TestNote;
+import ch6_hibernate.sn001_inner_transaction.repository.TestNoteRepository;
+import ch6_hibernate.sn001_inner_transaction.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
