@@ -1,0 +1,65 @@
+== Кеширование с помощью caffeine
+
+*Content:*
+
+- 1. Общая настройка кеширования
+- 2. Можем ли мы использовать один и тот же кеш в разных репозиториях?
+- 3. Полезные ссылки
+
+=== 1. Общая настройка кеширования
+
+====== 1. Добавляем депенденси на caffeine и coffee-boots:
+[source, xml]
+----
+<dependency>
+	<groupId>io.github.stepio.coffee-boots</groupId>
+	<artifactId>coffee-boots</artifactId>
+	<version>2.0.0</version>
+</dependency>
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-cache</artifactId>
+</dependency>
+<dependency>
+	<groupId>com.github.ben-manes.caffeine</groupId>
+	<artifactId>caffeine</artifactId>
+	<version>2.9.3</version>
+</dependency>
+----
+
+====== 2. Настраиваем application.yml
+[source, yaml]
+----
+spring:
+  cache:  #указывает тип кеша (caffeine, redis, hazlecast, etc.)
+    type: caffeine
+coffee-boots: # позволяет настроить >1 кеша
+  cache:
+    spec:
+      myCache: recordStats, maximumSize=100, expireAfterWrite=20s
+      secondCache: recordStats, maximumSize=100, expireAfterWrite=1h
+----
+(про *_recordStats_* и другие параметры кеширования caffeine смотри в link:https://www.javadoc.io/static/com.github.ben-manes.caffeine/caffeine/2.2.0/index.html?com/github/benmanes/caffeine/cache/Caffeine.html[javadoc])
+
+===== 3. Создаём класс с кешированием
+[source, java]
+----
+@CacheConfig(cacheNames = "myCache") // имя кеша
+public interface TestNoteRepository extends JpaRepository<TestNote, Long> {
+
+    @Cacheable // обычное кеширование
+    List<TestNote> findAll();
+
+    // метод очистки кеша, allEntries -> все сущности
+    @CacheEvict(allEntries = true)
+    default void evictTestCache() {}
+
+}
+----
+
+=== 2. Можем ли мы использовать один и тот же кеш в разных репозиториях?
+
+=== 3. Полезные ссылки
+
+- Про кеширование: link:https://habr.com/ru/articles/465667/[habr]
+- @CacheEvict: link:https://coderlessons.com/articles/java/spring-3-1-caching-i-cacheevict[coderlessons.com]

@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:h2:file:C:/Users/d.m.konstantinov/DRIVE/PROJECTS/my_own_projects/embedded-db/sn002_spring_cache
+    username: sa
+    password: pass
+  jpa:
+    properties:
+      hibernate:
+        jdbc.batch_size: 100
+  liquibase:
+    change-log: classpath:sn002_spring_cache/changelog.yaml
+  h2:
+    console:
+      enabled: true
+  cache:  #caching
+    type: caffeine
+#    cache-names: testCache
+#    caffeine.spec: recordStats, maximumSize=100, expireAfterWrite=20s
+coffee-boots: # позволяет настроить >1 кеша
+  cache:
+    spec:
+      myCache: recordStats, maximumSize=100, expireAfterWrite=20s
+logging:
+  level:
+    liquibase: INFO
