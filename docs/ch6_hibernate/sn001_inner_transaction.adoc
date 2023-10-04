@@ -36,7 +36,7 @@ transactionTemplate.execute(status -> {
 
 Тогда мы создадим новую транзакцию внутри существующей. Причем, если транзакция Б завершится нормально, а транзакция А упадет, то все что будет сделано в транзакции Б - сохранится.
 
-See: link:../../spring-security-learning/src/main/java/spring/sn005_inner_transaction[sn005_inner_transaction/...]
+See: link:../../hibernate-learning/src/main/java/ch6_hibernate/sn001_inner_transaction/[sn001_inner_transaction/...]
 
 === 3. Внутренняя транзакция и блокировки строк
 
@@ -52,7 +52,7 @@ value = SKIP_LOCKED + "") })
 List<TestNote> findByName(String name);
 ----
 
-See: link:../../spring-security-learning/src/main/java/spring/sn005_inner_transaction[sn005_inner_transaction/...]
+See: link:../../hibernate-learning/src/main/java/ch6_hibernate/sn001_inner_transaction/[sn001_inner_transaction/...]
 [source, java]
 ----
 org.h2.jdbc.JdbcSQLTimeoutException: Время ожидания блокировки таблицы {0} истекло
