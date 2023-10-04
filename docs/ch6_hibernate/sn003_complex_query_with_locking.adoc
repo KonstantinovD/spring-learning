@@ -1,0 +1,24 @@
+== Сложные sql-запросы с блокировками - пишем легко!
+
+*Content:*
+
+- 1. Аннотация @Query в помощь
+
+=== 1. Аннотация @Query в помощь
+
+Когда заходит речь о блокировках, select for update, то есть соблазн написать основной запрос через именование метода по типу `findForUpdateSkipLockedByNameAndState...`. Но что делать, если в запросе гораздо больше параметров? На самом деле необязательно писать префикс `'findForUpdateSkipLocked'`, аннотации *_@QueryHints_* и *_@Lock_* хорошо работают с *_@Query_*:
+[source, java]
+----
+@Lock(LockModeType.PESSIMISTIC_WRITE)
+@QueryHints({ @QueryHint(
+        name = "javax.persistence.lock.timeout", value = SKIP_LOCKED + "") })
+@Transactional(propagation = Propagation.MANDATORY)
+@Query(
+        """
+        select tn from TestNote tn
+        where tn.name = :name
+            and tn.text = :text
+            and tn.noteDate >= :noteDate
+        """)
+List<TestNote> findByName(String name, String text, LocalDate noteDate);
+----
