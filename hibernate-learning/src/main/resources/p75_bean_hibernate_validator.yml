@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:h2:file:C:/Users/d.m.konstantinov/DRIVE/PROJECTS/my_own_projects/embedded-db/p75_bean_hibernate_validator
+    username: sa
+    password: pass
+  jpa:
+    properties:
+      hibernate:
+        jdbc.batch_size: 100
+  liquibase:
+    change-log: classpath:p75_bean_hibernate_validator/changelog.yaml
+  h2:
+    console:
+      enabled: true
+logging:
+  level:
+    liquibase: INFO
