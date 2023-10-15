@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.Entity;
@@ -28,6 +29,7 @@ import static ch6_hibernate.p75_bean_hibernate_validator.constants.HibernateVali
 @ToString
 @NoArgsConstructor
 @Table(name = "items")
+@Accessors(chain = true)
 @Validated
 public class Item {
 

@@ -5,6 +5,7 @@
 - 1. Bean Validation. Валидация через persist() и Validator.validate()
 - 2. Валидация через аннотации @Validated/@Valid
 - 3. Валидация @Controller через @Valid
+- 4. Аннотация @Accessors - замена @Builder
 
 === 1. Bean Validation - что это
 
@@ -157,3 +158,22 @@ public class ExceptionHandlerController {
 
 image:img/ConstraintViolationResponseMessage.png[]
 
+=== 4. Аннотация @Accessors - замена @Builder
+
+Аннотация `@Accessors(chain = true)` позволяет из сеттеров возвращать текущий объект (и работать как с билдером, но еще лучше):
+[source, java]
+----
+@Accessors(chain = true)
+public class Item {
+    // some fields
+}
+
+//...
+
+private final ItemsRepository repository;
+
+repository.save(new Item()
+    .setName("a") // как с билдером
+    .setAuctionEnd(LocalDate.now().minusDays(2))
+);
+----
