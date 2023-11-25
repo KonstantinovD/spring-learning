@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:h2:file:C:/Users/d.m.konstantinov/DRIVE/PROJECTS/my_own_projects/embedded-db/p112_mapping_value_types
+    username: sa
+    password: pass
+  jpa:
+    properties:
+      hibernate:
+        jdbc.batch_size: 100
+  liquibase:
+    change-log: classpath:p112_mapping_value_types/changelog.yaml
+  h2:
+    console:
+      enabled: true
+logging:
+  level:
+    liquibase: INFO

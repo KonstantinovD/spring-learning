@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: p112_mapping_value_types
+      author: KonstantinovD
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: items
+      changes:
+        - createTable:
+            tableName: personal_items
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: personal_items_pk
+              - column:
+                  name: type
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: rarity
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+        - createSequence:
+            sequenceName: s_personal_items
+        - addDefaultValue:
+            tableName: personal_items
+            columnName: id
+            defaultValueSequenceNext: s_personal_items
