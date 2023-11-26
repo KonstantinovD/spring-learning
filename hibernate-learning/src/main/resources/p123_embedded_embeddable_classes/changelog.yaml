@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: p123_embedded_embeddable_classes
+      author: KonstantinovD
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: cities
+      changes:
+        - createTable:
+            tableName: cities
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: cities_pk
+              - column:
+                  name: city_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: address_city_name
+                  type: varchar(255)
+              - column:
+                  name: country_name
+                  type: varchar(255)
+              - column:
+                  name: humans_number
+                  type: bigint
+              - column:
+                  name: man_percentage
+                  type: numeric(10,6)
+              - column:
+                  name: population_info
+                  type: varchar(255)
+        - createSequence:
+            sequenceName: s_cities
+        - addDefaultValue:
+            tableName: cities
+            columnName: id
+            defaultValueSequenceNext: s_cities
