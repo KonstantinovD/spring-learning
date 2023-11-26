@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: p129_jpa_converters
+      author: KonstantinovD
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: prices
+      changes:
+        - createTable:
+            tableName: prices
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: prices_pk
+              - column:
+                  name: price
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: item_id
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+        - createSequence:
+            sequenceName: s_prices
+        - addDefaultValue:
+            tableName: prices
+            columnName: id
+            defaultValueSequenceNext: s_prices
