@@ -1,0 +1,5 @@
+== deleteAll() под капотом вызывает findAll()
+
+Действительно:
+
+image:img/delete_all_calls_find_all.png[]
