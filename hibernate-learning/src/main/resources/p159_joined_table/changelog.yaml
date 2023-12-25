@@ -1,0 +1,93 @@
+databaseChangeLog:
+  - changeSet:
+      id: p151_table_per_class_with_polymorphism
+      author: KonstantinovD
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: bank_accounts
+      changes:
+        - createTable:
+            tableName: billing_details
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: billing_details_pk
+              - column:
+                  name: owner
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+        - createSequence:
+            sequenceName: s_billing_details
+        - addDefaultValue:
+            tableName: billing_details
+            columnName: id
+            defaultValueSequenceNext: s_billing_details
+        - createTable:
+            tableName: bank_accounts
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: bank_accounts_pk
+              - column:
+                  name: account
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: bank_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: swift
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            constraintName: bank_accounts_fk1
+            baseColumnNames: id
+            baseTableName: bank_accounts
+            referencedColumnNames: id
+            referencedTableName: billing_details
+        - createTable:
+            tableName: credit_cards
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: credit_cards_pk
+              - column:
+                  name: card_number
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: exp_month
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: exp_year
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            constraintName: credit_cards_fk1
+            baseColumnNames: id
+            baseTableName: credit_cards
+            referencedColumnNames: id
+            referencedTableName: billing_details
