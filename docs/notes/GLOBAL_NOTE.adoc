@@ -3,8 +3,9 @@
 === 02/04/2023
 
 - JVM - Java memory model +
-* link:https://proselyte.net/jvm-basics/[про jvm - Heap, Stack, MetaSpace, Native Method Stacks, String Pool; Garbage Collector - 4 types, JNI - java native] +
-* link:https://stackoverflow.com/questions/50163218/is-method-area-still-present-in-java-8[Meta Space встроена в Method area - это логическая концепция а не прямая реализация, на различиях можно не зацикливаться] +
+* link:https://proselyte.net/jvm-basics/[про jvm - Heap, Stack, MetaSpace, Native Method Stacks, String Pool; Garbage Collector - 4 types, JNI - java native]
+* link:https://habr.com/ru/companies/otus/articles/776342/[Garbage collector]
+* link:https://stackoverflow.com/questions/50163218/is-method-area-still-present-in-java-8[Meta Space встроена в Method area - это логическая концепция а не прямая реализация, на различиях можно не зацикливаться]
 * link:https://www.baeldung.com/string/intern#:~:text=intern(),-Last%20modified%3A%20September&text=The%20method%20intern()%20creates,point%20to%20the%20other%20String.[String.intern()] и link:https://www.baeldung.com/java-string-pool[String pool]
 
 - Феномены чтения в БД +
