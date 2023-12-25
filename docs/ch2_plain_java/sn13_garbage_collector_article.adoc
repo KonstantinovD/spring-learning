@@ -1,0 +1,5 @@
+== Хорошая статья про GC:
+
+=== Статья про Garbage Collector / Java Memory Model (JMM) / Сравнение типов GC
+
+link:https://habr.com/ru/companies/otus/articles/776342/[habr]
