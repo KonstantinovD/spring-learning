@@ -1,0 +1,78 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2023_10_04_p75_bean_hibernate_validator
+      author: KonstantinovD
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: items
+      changes:
+        - createTable:
+            tableName: items
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: items_pk
+              - column:
+                  name: name
+                  type: varchar(255)
+        - createSequence:
+            sequenceName: s_items
+        - addDefaultValue:
+            tableName: items
+            columnName: id
+            defaultValueSequenceNext: s_items
+        - createTable:
+            tableName: images
+            columns:
+              - column:
+                  name: item_id
+                  type: numeric
+                  constraints:
+                    nullable: false
+              - column:
+                  name: title
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: filename
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: width
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: height
+                  type: int
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            columnNames: item_id, filename
+            constraintName: images_pk
+            tableName: images
+        - createTable:
+            tableName: properties
+            columns:
+              - column:
+                  name: item_id
+                  type: numeric
+                  constraints:
+                    nullable: false
+              - column:
+                  name: property
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            columnNames: item_id, property
+            constraintName: pk_properties
+            tableName: properties
