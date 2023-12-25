@@ -54,10 +54,12 @@ This project is used for in-depth study of Spring Framework.
 │
 ├── spring-learning-src                          [Spring, plain Java]
 │   │
-│   ├── book (Книга 'Spring for Professionals' 
-              и отдельные Snippets)
+│   ├── book (Книга 'Spring for Professionals', 
+              разработка завершена)
 │   ├── ch2_plain_java (java заметки и примеры, 
                         большинство без доков)
+│   ├── spring (Сниппеты, актуальный фолдер 
+                для примеров)
 │   ├── testing (мусор)
 │   │
 ├── spring-security-learning                     [spring security & H2/hibernate]
