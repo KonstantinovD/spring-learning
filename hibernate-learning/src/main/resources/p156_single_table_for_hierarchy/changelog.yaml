@@ -1,0 +1,52 @@
+databaseChangeLog:
+  - changeSet:
+      id: p151_table_per_class_with_polymorphism
+      author: KonstantinovD
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: billing_details
+      changes:
+        - createTable:
+            tableName: billing_details
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: bank_accounts_pk
+              - column:
+                  name: owner
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: discriminator_type
+                  type: varchar(16)
+              - column:
+                  name: account
+                  type: varchar(255)
+              - column:
+                  name: bank_name
+                  type: varchar(255)
+              - column:
+                  name: swift
+                  type: varchar(255)
+              - column:
+                  name: card_number
+                  type: varchar(255)
+              - column:
+                  name: exp_month
+                  type: varchar(255)
+              - column:
+                  name: exp_year
+                  type: varchar(255)
+        - createSequence:
+            sequenceName: s_billing_details
+        - addDefaultValue:
+            tableName: billing_details
+            columnName: id
+            defaultValueSequenceNext: s_billing_details
