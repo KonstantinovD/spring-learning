@@ -14,7 +14,7 @@
 - Пример прокси в Java: link:https://javarush.ru/groups/posts/2281-dinamicheskie-proksi[javarush]
 
 Example of proxy (NOT WORKING, ClassCastException):
-*_See_* _book.sn003_proxy/..._
+*_See_* _spring.sn003_proxy/..._
 
 ==== JDK dynamic proxy vs CGLIB proxy
 

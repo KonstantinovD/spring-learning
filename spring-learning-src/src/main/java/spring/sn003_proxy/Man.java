@@ -1,4 +1,4 @@
-package book.sn003_proxy;
+package spring.sn003_proxy;
 
 import lombok.Getter;
 import lombok.Setter;
