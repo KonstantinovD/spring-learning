@@ -1,0 +1,72 @@
+databaseChangeLog:
+  - changeSet:
+      id: p151_table_per_class_with_polymorphism
+      author: KonstantinovD
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: bank_accounts
+      changes:
+        - createTable:
+            tableName: bank_accounts
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: bank_accounts_pk
+              - column:
+                  name: owner
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: account
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: bank_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: swift
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: credit_cards
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: credit_cards_pk
+              - column:
+                  name: owner
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: card_number
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: exp_month
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: exp_year
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+        - createSequence:
+            sequenceName: s_billing_details
