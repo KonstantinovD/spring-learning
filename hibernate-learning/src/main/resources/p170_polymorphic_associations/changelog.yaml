@@ -1,0 +1,115 @@
+databaseChangeLog:
+  - changeSet:
+      id: p151_table_per_class_with_polymorphism
+      author: KonstantinovD
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: bank_accounts
+      changes:
+        - createSequence:
+            sequenceName: s_billing_details
+        - createTable:
+            tableName: bank_accounts
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: bank_accounts_pk
+              - column:
+                  name: owner
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: account
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: bank_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: swift
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: numeric
+        - addDefaultValue:
+            tableName: bank_accounts
+            columnName: id
+            defaultValueSequenceNext: s_billing_details
+        - createTable:
+            tableName: credit_cards
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: credit_cards_pk
+              - column:
+                  name: owner
+                  type: varchar(255)
+              - column:
+                  name: card_number
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: exp_month
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: exp_year
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: numeric
+        - addDefaultValue:
+            tableName: credit_cards
+            columnName: id
+            defaultValueSequenceNext: s_billing_details
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: users_pk
+              - column:
+                  name: name
+                  type: varchar(64)
+        - createSequence:
+            sequenceName: s_users
+        - addDefaultValue:
+            tableName: users
+            columnName: id
+            defaultValueSequenceNext: s_users
+        - addForeignKeyConstraint:
+            constraintName: credit_cards_fk1
+            baseColumnNames: user_id
+            baseTableName: credit_cards
+            referencedColumnNames: id
+            referencedTableName: users
+        - addForeignKeyConstraint:
+            constraintName: bank_accounts_fk1
+            baseColumnNames: user_id
+            baseTableName: bank_accounts
+            referencedColumnNames: id
+            referencedTableName: users

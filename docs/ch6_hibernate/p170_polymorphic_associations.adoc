@@ -1,0 +1,82 @@
+== Полиморфные ассоциации
+
+Чтобы использовать полиморфные ассоциации в Hibernate, не нужно делать ничего особенного; если целевой класс ассоциации отображается с помощью аннотаций @Entity и @Inheritance, ассоциация автоматически становится полиморфной (не работает в случае с @MappedSuperclass):
+
+*_See:_* link:../../hibernate-learning/src/main/java/ch6_hibernate/p170_polymorphic_associations/entity/User.java[User.java]:
+[source, java]
+----
+@Entity
+@Data
+@Table(name = "users")
+public class User {
+
+    @Id
+    private Long id;
+
+    private String name;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    private Set<BillingDetails> billingDetails = new HashSet<>();
+}
+----
+
+*_See:_* link:../../hibernate-learning/src/main/java/ch6_hibernate/p170_polymorphic_associations/entity/BillingDetails.java[BillingDetails.java]:
+[source, java]
+----
+@Data
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+public abstract class BillingDetails {
+
+    @Id
+    protected Long id;
+
+    @NotNull
+    protected String owner;
+
+    @ManyToOne
+    protected User user;
+
+}
+----
+
+Таким образом, можно извлечь список BillingDetails для конкретного User-а - *_See:_* link:../../hibernate-learning/src/main/java/ch6_hibernate/p170_polymorphic_associations/JpaPolymorphicAssociationsScheduler.java[JpaPolymorphicAssociationsScheduler.java]:
+[source, java]
+----
+public void process() {
+    var bankAccount = new BankAccount().setAccount("account1").setBankName("SuperBank").setSwift("blocked");
+    bankAccount.setOwner("VASILY");
+    var creditCard = new CreditCard().setCardNumber("1234_5555").setExpYear("26").setExpMonth("05");
+    creditCard.setOwner("VASILY");
+
+    User user = new User().setName("VASILY");
+    user.addBillingDetail(bankAccount);
+    user.addBillingDetail(creditCard);
+
+    userRepository.save(user); // save user in table
+    bankAccountRepository.save(bankAccount); // save bank account with filled in user_id field
+    creditCardRepository.save(creditCard); // save credit card with filled in user_id field
+
+    List<BillingDetails> details = em.createQuery("select bd from BillingDetails bd", BillingDetails.class)
+                .getResultList();
+    assertEquals(2, details.size());
+
+    assertTrue(details.get(0) instanceof BankAccount);
+    assertTrue(details.get(1) instanceof CreditCard);
+    details.forEach(detail -> {
+        assertEquals(user.getName(), detail.getUser().getName());
+        assertEquals(user, detail.getUser());
+    });
+
+    var savedUser = userRepository.findAll().get(0);
+    assertEquals(2, savedUser.getBillingDetails().size());
+    assertEquals(1, savedUser.getBillingDetails()
+        .stream().filter(
+            billingDetails ->
+                billingDetails instanceof BankAccount).count());
+    assertEquals(1, savedUser.getBillingDetails()
+        .stream().filter(
+            billingDetails ->
+                billingDetails instanceof CreditCard).count());
+}
+----
