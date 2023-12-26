@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: p112_mapping_value_types
+      id: changeset_default_name
       author: KonstantinovD
       preConditions:
         - onFail: MARK_RAN

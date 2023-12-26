@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: test_table_liquibase_migration
+      id: changeset_default_name
       author: KonstantinovD
       preConditions:
         - onFail: MARK_RAN

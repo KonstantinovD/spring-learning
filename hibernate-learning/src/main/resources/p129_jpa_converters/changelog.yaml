@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: p129_jpa_converters
+      id: changeset_default_name
       author: KonstantinovD
       preConditions:
         - onFail: MARK_RAN

@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: p123_embedded_embeddable_classes
+      id: changeset_default_name
       author: KonstantinovD
       preConditions:
         - onFail: MARK_RAN

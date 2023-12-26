@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: p151_table_per_class_with_polymorphism
+      id: changeset_default_name
       author: KonstantinovD
       preConditions:
         - onFail: MARK_RAN

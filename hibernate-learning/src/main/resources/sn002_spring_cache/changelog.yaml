@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: 2023_09_14_sn002_spring_cache
+      id: changeset_default_name
       author: KonstantinovD
       preConditions:
         - onFail: MARK_RAN

@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: 2023_09_08_p65_presisted_object_and_hibernate_properties
+      id: changeset_default_name
       author: KonstantinovD
       preConditions:
         - onFail: MARK_RAN
