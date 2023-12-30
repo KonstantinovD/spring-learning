@@ -1,0 +1,64 @@
+databaseChangeLog:
+  - changeSet:
+      id: changeset_default_name
+      author: KonstantinovD
+      changes:
+        changes:
+          - createTable:
+              tableName: users
+              columns:
+                - column:
+                    name: id
+                    type: numeric
+                    constraints:
+                      nullable: false
+                      primaryKey: true
+                      primaryKeyName: users_pk
+                - column:
+                    name: name
+                    type: varchar(255)
+                    constraints:
+                      nullable: false
+          - createSequence:
+              sequenceName: s_users
+          - addDefaultValue:
+              tableName: users
+              columnName: id
+              defaultValueSequenceNext: s_users
+          - createTable:
+              tableName: addresses
+              columns:
+                - column:
+                    name: id
+                    type: numeric
+                    constraints:
+                      nullable: false
+                      primaryKey: true
+                      primaryKeyName: addresses_pk
+                - column:
+                    name: country_name
+                    type: varchar(255)
+                    constraints:
+                      nullable: false
+                - column:
+                    name: city_name
+                    type: varchar(255)
+          - createSequence:
+              sequenceName: s_addresses
+          - addDefaultValue:
+              tableName: addresses
+              columnName: id
+              defaultValueSequenceNext: s_addresses
+          - createTable:
+              tableName: user_address
+              columns:
+                - column:
+                    name: user_id
+                    type: numeric
+                    constraints:
+                      nullable: false
+                - column:
+                    name: address_id
+                    type: numeric
+                    constraints:
+                      nullable: false
