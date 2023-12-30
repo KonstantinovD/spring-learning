@@ -39,7 +39,7 @@ public class User {
             name = "user_address", // Имя таблицы соединения - обязательно!
             joinColumns = @JoinColumn(name = "user_id"), // столбец id текущей таблицы (users)
             // столбец id таблицы, к которой идёт связь (addresses)
-            inverseJoinColumns = @JoinColumn(name = "address_id", nullable = false, unique = true)
+            inverseJoinColumns = @JoinColumn(name = "address_id", nullable = false)
     )
     protected Address address;
 
@@ -124,7 +124,7 @@ public class User {
             name = "user_address",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(
-                    name = "address_id", nullable = false, unique = true)
+                    name = "address_id", nullable = false)
     )
     protected Address address;
 

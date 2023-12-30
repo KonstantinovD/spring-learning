@@ -40,6 +40,7 @@ public class User {
             name = "user_address", // Имя таблицы соединения - обязательно!
             joinColumns = @JoinColumn(name = "user_id"), // столбец id текущей таблицы (users)
             // столбец id таблицы, к которой идёт связь (addresses)
+            // unique = true и nullable=false в @JoinColumn работает только при создании схемы БД самим Hibernate
             inverseJoinColumns = @JoinColumn(name = "address_id", nullable = false, unique = true)
     )
     protected Address address;
