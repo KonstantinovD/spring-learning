@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: changeset_default_name
+      author: KonstantinovD
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: users_pk
+              - column:
+                  name: department_id
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: users_pk
+              - column:
+                  name: employee_type
+                  type: varchar(255)
+        - createTable:
+            tableName: departments
+            columns:
+              - column:
+                  name: id
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: departments_pk
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
