@@ -1,0 +1,58 @@
+databaseChangeLog:
+  - changeSet:
+      id: changeset_default_name
+      author: KonstantinovD
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: users_pk
+              - column:
+                  name: name
+                  type: varchar(64)
+        - createSequence:
+            sequenceName: s_users
+        - addDefaultValue:
+            tableName: users
+            columnName: id
+            defaultValueSequenceNext: s_users
+        - createTable:
+            tableName: addresses
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: addresses_pk
+              - column:
+                  name: country_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: city_name
+                  type: varchar(255)
+              - column:
+                  name: user_id
+                  type: numeric
+        - addAutoIncrement:
+            columnDataType: numeric
+            columnName: id
+            defaultOnNull: false
+            generationType: ALWAYS
+            incrementBy: 1
+            tableName: addresses
+        - addForeignKeyConstraint:
+            constraintName: addresses_fk1
+            baseColumnNames: user_id
+            baseTableName: addresses
+            referencedColumnNames: id
+            referencedTableName: users
