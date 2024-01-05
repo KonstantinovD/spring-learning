@@ -35,7 +35,7 @@ public class OneToOneJoinedTableScheduler {
         Address address = new Address().setCountryName("Belarus").setCityName("Gomel");
         Address address2 = new Address().setCountryName("Belarus").setCityName("Minsk");
         transactionalProcessor.runInNewTransaction(() -> {
-            userRepository.saveAndFlush(user);
+            userRepository.save(user);
             addressRepository.save(address);
             address2.setUser(user);
             // user.setAddress(address2); // если такое сделать - то будет 2 записи в "user_address"
