@@ -37,6 +37,8 @@ public class InsertIdBatchProblemScheduler {
         transactionalProcessor.runInNewTransaction(() -> {
             userRepository.save(user1);
             userRepository.save(user2);
+            // если делать saveAll (и даже менять allocationSize) -
+            // все равно 'call next value for s_users' будет вызываться дважды
             var addresses = List.of(address1, address2);
             addressRepository.saveAll(addresses);
             int ignored = 2;
