@@ -4,6 +4,9 @@
 
 - 1. Интерфейс EntityManager - введение
 - 2. Сохранение данных через EntityManager. Порядок выполнения SQL-INSERT и присвоения ID сущностям
+- 3. Извлечение и модификация хранимых данных
+  * 3.1 Hibernate state snapshots. Hibernate создает копии исходного состояния объекта. Dirty checking
+  * 3.2 Получение прокси-объекта (ссылки на объект) entity
 
 === 1. Интерфейс EntityManager - введение
 
@@ -63,5 +66,89 @@ image:img/SavingEntityViaEM.png[]
 
 Связанные с этим проблемы рассмотрены в статье link:p279_insert_id_order.adoc[] (вкратце - выполнение всех накопленных insert-ов посреди транзакций и невозможность батчевого insert-а в случае генерации ID во время вставки).
 
+=== 3. Извлечение и модификация хранимых данных
 
+С помощью *_EntityManager_* можно извлекать объекты из БД. Предположим что мы где-то сохранили ID объекта Item из прошлого пункта, и теперь нужно найти этот объект по ID в рамках новой единицы работы:
+[source, java]
+----
+Item item = em.find(Item.class, ITEM_ID);
+
+if (item != null) {
+    item.setName("New Name");
+}
+----
+
+Эта единица работы и создание экземпляра *_Item_* изображены на рисунке (где P = persisted, D = detached):
+image:img/FindingEntityViaEM.png[]
+
+Возвращаемый экземпляр сущности находится в хранимом состоянии, и его можно изменить в рамках единицы работы. Контекст хранения автоматически обнаружит эти изменения и запишет их в базу данных. Hibernate старается передать изменения в базу данных как можно позже. Инструкции DML обычно устанавливают в базе данных блокировку, существующую до конца транзакции, так что Hibernate старается свести продолжительность блокировки к минимуму.
+
+==== 3.1 Hibernate state snapshots. Hibernate создает копии исходного состояния объекта. Dirty checking
+
+Для отслеживания изменений в сущностях, Hibernate использует *"state snapshots"* или *"снимки состояния"*, представляющие из себя *массивы хранимых БД объектов*. Их также можно назвать *копиями состояния*.
+
+Для примера возьмем класс link:../../hibernate-learning/src/main/java/ch6_hibernate/p279_1_insert_id_order/entity/User.java[User.java] - тогда для объектов этого класса *_снимком состояния_* будет массив объектов `[[BigDecimal][String]]` (поскольку именно такие типы полей содержит таблица "users"):
+[source, java]
+----
+@Entity
+@Table(name = "users")
+public class User {
+    @Id
+    private BigDecimal id;
+
+    private String name;
+
+    @OneToMany(mappedBy = "user") // не хранится в таблице "users"
+    protected List<Address> addresses;
+}
+----
+
+Массив *_копии состояния_* расходует память. Проверка состояния объектов с использованием копий также увеличивает накладные расходы, поскольку во время выталкивания контекста Hibernate должен сравнить все экземпляры в контексте с их копиями.
+
+Как это все работает? В момент загрузки объекта User из базы данных Hibernate создает копию исходного массива состояния загруженных строк для сравнения исходного и модифицированного объектов. При сбросе единицы работы происходит сравнение исходного массива и объекта сущности. Если объект отличается от копии, значит, требуется выполнить операцию UPDATE. Подобное сравнение называется *dirty checking*.
+
+*_Dirty checking_* просто сравнивает отдельные поля сущности с их значением в массиве состояния. Она не зависит от методов Equals/Hashcode (кроме случаев использования java.util.Set, но это связано с API коллекций).
+
+В большинстве случаев разработчикам нет смысла беспокоиться о грязной проверке, это забота фреймворка. Однако мы можем настроить порядок выявления изменений, используя два способа:
+
+- 1. Указать в property `hibernate.entity_dirtiness_strategy` имя класса, реализующего интерфейс `org.hibernate.CustomEntityDirtinessStrategy`.
+- 2. Использовать интерфейс `org.hibernate.Interceptor`, который представляет схожий и более удобный механизм управления проверкой состояния объектов путем реализации его метода `findDirty()` - об этом мы поговорим несколько позже - *_See:_* ...
+
+==== 3.2 Получение прокси-объекта (ссылки на объект) entity
+
+Иногда может потребоваться получить экземпляр сущности без обращения к базе данных. Например, если вы еще не знаете, понадобится ли вам полностью инициализированный
+экземпляр. В этом случае можно заставить *_EntityManager_* загрузить пустой указатель – прокси-объект. +
+*_See:_* link:../../hibernate-learning/src/main/java/ch6_hibernate/p277_entity_proxy_reference/EntityProxyReferenceScheduler.java[EntityProxyReferenceScheduler.java]:
+[source, java]
+----
+private void process(EntityManager em) {
+    User user1 = em.getReference(User.class, USER_ID_1);
+    assertFalse(isInitialized(em, user1));
+    assertEquals(user1.getName(), "Mikhail");
+    assertTrue(isInitialized(em, user1));
+
+    User user2 = em.getReference(User.class, USER_ID_2);
+    assertFalse(isInitialized(em, user2));
+    Hibernate.initialize(user2);
+    assertTrue(isInitialized(em, user2));
+
+    User user3 = new User().setName(USER_NAME_3);
+    userRepository.save(user3);
+    User userFromDb = em.getReference(User.class, user3.getId());
+    assertTrue(isInitialized(userFromDb));
+}
+
+private boolean isInitialized(EntityManager em, User user) {
+    return em.getEntityManagerFactory()
+       .getPersistenceUnitUtil().isLoaded(user)
+}
+
+----
+В листинге выше показан метод проверки, загружен ли entity в текущий persistence context. Если контекст хранения уже содержит объект *_User_* с заданным ID, он будет возвращен методом `getReference()` без обращения к БД. Если в данный
+момент в управляемом состоянии нет ни одной такой entity, Hibernate создаст прокси-объект. Это значит, что метод `getReference()` не будет обращаться к БД, но и не вернет null, в отличие от метода find(). +
+Стоит только вызвать какой-нибудь метод прокси-объекта, например `User.getName()`, как тут же будет выполнена инструкция SELECT для его полной инициализации. Исключением из правила является метод getId(). Если соответствующей записи в БД не окажется, при вызове метода `User.getName()` будет возбуждено исключение `EntityNotFoundException`.
+
+В Hibernate имеется удобный статический метод `initialize()` для загрузки данных прокси-объекта, который так же может вызвать исключение `EntityNotFoundException`.
+
+После закрытия контекста хранения прокси-объект User становится detached, и если он не был инициализирован, пока контекст хранения был открыт, при обращении к прокси-объекту будет возбуждено исключение `LazyInitializationException`.
 
