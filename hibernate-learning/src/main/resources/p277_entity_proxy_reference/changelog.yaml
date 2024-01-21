@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: changeset_default_name
+      author: KonstantinovD
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: users_pk
+              - column:
+                  name: name
+                  type: varchar(64)
+        - createSequence:
+            sequenceName: s_users
+        - addDefaultValue:
+            tableName: users
+            columnName: id
+            defaultValueSequenceNext: s_users
