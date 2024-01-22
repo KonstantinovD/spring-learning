@@ -44,6 +44,9 @@ public class InsertIdOrderScheduler {
             // Hibernate: insert into users (name, id) values (?, ?)
             // Hibernate: insert into users (name, id) values (?, ?)
             // Hibernate: insert into addresses (id, city_name, country_name, user_id) values (null, ?, ?, ?)
+
+            // P. S. org.hibernate.flushMode=COMMIT не повлияет
+
             userRepository.save(user3);
             // ЛОГИ HIBERNATE - insert user-а еще не произошел
             // Hibernate: call next value for s_users
