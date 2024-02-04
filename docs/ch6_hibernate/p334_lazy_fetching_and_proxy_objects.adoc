@@ -1,0 +1,153 @@
+== Lazy и eager загрузка. Прокси-объекты
+
+Полезная ссылка: link:https://docs.jboss.org/hibernate/orm/4.2/manual/en-US/html/ch20.html[HB Improving performance]
+
+*Content:*
+
+- 0. Введение
+- 1. Прокси-объекты для lazy fetching
+  * 1.1 Прокси-объекты имеют другой class
+  * 1.2 Проверка, инициализирована ли сущность или ее свойство
+  * 1.3 Присоединение сущностей без загрузки из из базы. Особенности прокси объектов
+- 2. Lazy fetching коллекций
+
+=== 0. Введение
+
+По дефолту каждый маппинг сущностей имеет свою fetch стратегию. *_@ManyToOne_* и *_@OneToOne_* - EAGER, *_@OneToMany_* и *_@ManyToMany_* - LAZY. Их можно переопределять при указании связи либо через *_@EntityGraph_*.
+
+=== 1. Прокси-объекты для lazy fetching
+
+Для реализации LAZY-загрузки Hibernate использует сгенерированные прокси-объекты.
+
+Ранее мы рассматривали метод `em.getReference()`, который возвращает прокси объект. Рассмотрим следующий код - +
+*_See:_* link:../../hibernate-learning/src/main/java/ch6_hibernate/p334_one_to_one_lazy_and_eager_fetching/OneToOneFetchingScheduler.java[OneToOneFetchingScheduler.java]:
+
+[source, java]
+----
+transactionalProcessor.runInNewTransaction(() -> {
+    // Никакого SELECT
+    Item item = em.getReference(Item.class, itemId.get());
+    // Вызов метода чтения идентификатора (без доступа
+    // к членам класса!) не вызовет инициализацию
+    assertEquals(item.getId(), itemId.get());
+
+    // ...
+});
+----
+
+Весь код сверху не приведет к отправке SQL-запроса SELECT (исключение - debug мод). Hibernate просто создаст прокси-объект Item: он выглядит как настоящий объект, но это всего лишь заглушка. Если вызвать любой метод прокси-объекта, отличный от метода чтения ID, произойдут обращение к базе данных и инициализация прокси-объекта. При вызове `item.getName()` выполнится SQL-инструкция SELECT, которая загрузит экземпляр Item.
+
+Прокси-объект – это экземпляр подкласса Item, сгенерированный во время выполнения и хранящий ID. Вот почему Hibernate (наряду с JPA) требует, чтобы класс сущности имел public или private конструктор без аргументов. Чтобы Hibernate смог сгенерировать прокси-объект, класс сущности и его методы не должны быть final.
+
+==== 1.1 Прокси-объекты имеют другой class
+
+Рассмотрим следующую часть link:../../hibernate-learning/src/main/java/ch6_hibernate/p334_one_to_one_lazy_and_eager_fetching/OneToOneFetchingScheduler.java[OneToOneFetchingScheduler.java]:
+
+[source, java]
+----
+transactionalProcessor.runInNewTransaction(() -> {
+    // ...
+
+    // Прокси-класс сгенерирован во время выполнения и получает
+    // примерно такое имя: Item$HibernateProxy$hkR6xO8q
+    assertNotEquals(item.getClass(), Item.class);
+    assertTrue(item.getClass().getSimpleName()
+        .startsWith("Item$HibernateProxy"));
+
+    // Для получения реального типа прокси
+    // используйте класс HibernateProxyHelper.
+    assertEquals(
+        HibernateProxyHelper.getClassWithoutInitializingProxy(item),
+        Item.class
+    );
+
+    // ...
+});
+----
+
+Поскольку прокси суть подкласс класса сущности, объект прокси имеет другой тип класса, нежели Item. Вызов метода `item.getClass()` даст специфический класс с примерно таким именем: *_Item$HibernateProxy$hkR6xO8q_*. Для получения реального типа прокси нужно использовать класс HibernateProxyHelper и его метод `HibernateProxyHelper.getClassWithoutInitializingProxy(item)`.
+
+==== 1.2 Проверка, инициализирована ли сущность или ее свойство
+
+В JPA имеется класс PersistenceUtil, который можно использовать для проверки состояния инициализации сущности или любого ее атрибута (link:../../hibernate-learning/src/main/java/ch6_hibernate/p334_one_to_one_lazy_and_eager_fetching/OneToOneFetchingScheduler.java[OneToOneFetchingScheduler.java]):
+
+[source, java]
+----
+transactionalProcessor.runInNewTransaction(() -> {
+
+    // ...
+
+    PersistenceUtil persistenceUtil = Persistence.getPersistenceUtil();
+    assertFalse(persistenceUtil.isLoaded(item));
+    // Позволяет проверить, загружено ли значение поля
+    // Обычно используется с LAZY-fetch
+    assertFalse(persistenceUtil.isLoaded(item, "name"));
+    assertFalse(Hibernate.isInitialized(item));
+    // Вызовет инициализацию item!
+    // assertFalse(Hibernate.isInitialized(item.getSeller()));
+});
+----
+
+Метод `persistenceUtil.isLoaded()` и статический метод `Hibernate.isInitialized(item)` по факту идентичны и они проверяют, загружена ли сущность в persistence context. Но вторая версия метода - `persistenceUtil.isLoaded(item, "name")` - принимает имя свойства объекта и позволяет проверять загрузку конкретного свойства. Для обычного поля таблицы это не будет иметь особого значения, но может быть полезно с lazy-полями класса, которые инициализируются только после обращения к ним.
+
+==== 1.3 Присоединение сущностей без загрузки из из базы. Особенности прокси объектов
+
+Прокси-объекты Hibernate могут пригодиться не только в случае простой отложенной загрузки. Например, можно сохранить новую ставку (Bid), не загружая в память никаких данных:
+[source, java]
+----
+Item item = em.getReference(Item.class, ITEM_ID);
+User user = em.getReference(User.class, USER_ID);
+
+Bid newBid = new Bid(new BigDecimal("99.00"));
+newBid.setItem(item);
+newBid.setBidder(user);
+
+em.persist(newBid);
+// ЛОГИ HIBERNATE - произошел только insert BID
+// select User не произошел
+// Hibernate: insert into BID values (?, ? ,? , ...)
+----
+
+При работе с прокси-объектами вы должны иметь в виду их некоторые негативные аспекты:
+
+- 1)  при работе с прокси-классами сущностей нужно избегать прямых обращений к полям в реализациях методов equals() и hashCode()
+- 2) прокси-объекты могут использоваться только для отложенной загрузки связей сущностей. Они не могут применяться для отложенной загрузки полей простых типов или встроенных компонентов
+
+=== 2. Lazy fetching коллекций
+
+При загрузке сущности Hibernate не станет тут же загружать ее коллекцию связанных сущностей. Коллекция будет загружена по требованию, когда произойдет обращение к ней. Даже count() вызовет загрузку коллекции.
+
+Чтобы избавить от необходимости писать множество тривиальных запросов, Hibernate предоставляет свой способ отображения коллекций:
+[source, java]
+----
+@Entity
+public class Item {
+
+    @OneToMany(mappedBy = "item")
+    @org.hibernate.annotations.LazyCollection(
+        org.hibernate.annotations.LazyCollectionOption.EXTRA
+    )
+    public Set<Bid> getBids() {
+        return bids;
+    }
+
+    // ...
+}
+----
+
+Параметр `LazyCollectionOption.EXTRA` включает поддержку операций с коллекцией, не вызывающих ее полную инициализацию. Например, можно узнать размер коллекции:
+[source, java]
+----
+Item item = em.find(Item.class, ITEM_ID);
+// Hibernate: select * from ITEM where ID = ?
+assertEquals(item.getBids().size(), 3);
+// ЛОГИ HIBERNATE - произошел count BID а не select
+// Hibernate: select count(b) from BID b where b.ITEM_ID = ?
+----
+
+- Операции _size()_/_isEmpty()_ выполнит SQL-запрос _SELECT COUNT()_, но не загрузит коллекцию в память. Для операции _contains()_ также будет выполнен отдельный запрос.
+- При вызове метода _add(_) Set проверит повторяющиеся элементы с помощью простого запроса.
+- List с дополнительным параметром загрузит только один элемент при вызове _get(index)_.
+- Map будет использовать простой запрос для операций _containsKey()_ и _containsValue(_).
+
+https://docs.jboss.org/hibernate/orm/4.2/manual/en-US/html/ch20.html#:~:text=By%20default%2C%20Hibernate%20uses%20lazy,fetch%20optimization%20for%20lazy%20fetching.

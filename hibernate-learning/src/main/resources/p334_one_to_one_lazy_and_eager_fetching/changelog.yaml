@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: changeset_default_name
+      author: KonstantinovD
+      changes:
+        - createTable:
+            tableName: items
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: items_pk
+              - column:
+                  name: name
+                  type: varchar(64)
+              - column:
+                  name: price_id
+                  type: numeric
+              - column:
+                  name: seller_id
+                  type: numeric
+        - createSequence:
+            sequenceName: s_items
+        - addDefaultValue:
+            tableName: items
+            columnName: id
+            defaultValueSequenceNext: s_items
