@@ -13,9 +13,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @RestController
 public class TrimStrsFromJsonController {
 
+    private static final String OK_RESULT = "All checks are OK";
+
     // Даже если строки будут одинаковые в dto, json-десериализатор из них сделает разные объекты
     @GetMapping("/test_strs")
-    public void index(@RequestBody ItemDto itemDto) {
+    public String index(@RequestBody ItemDto itemDto) {
         assertFalse(itemDto.getId() == itemDto.getName());
         assertFalse(itemDto.getId() == itemDto.getCode());
         assertFalse(itemDto.getName() == itemDto.getCode());
@@ -28,7 +30,8 @@ public class TrimStrsFromJsonController {
         assertTrue(itemDto.getId() == itemDto.getCode());
         assertTrue(itemDto.getName() == itemDto.getCode());
 
-        log.info("All checks are OK");
+        log.info(OK_RESULT);
+        return OK_RESULT;
     }
 
 }
