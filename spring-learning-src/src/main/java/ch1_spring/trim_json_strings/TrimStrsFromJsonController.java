@@ -27,6 +27,8 @@ public class TrimStrsFromJsonController {
         assertTrue(itemDto.getId() == itemDto.getName());
         assertTrue(itemDto.getId() == itemDto.getCode());
         assertTrue(itemDto.getName() == itemDto.getCode());
+
+        log.info("All checks are OK");
     }
 
 }
