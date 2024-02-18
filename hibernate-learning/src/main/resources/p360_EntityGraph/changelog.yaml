@@ -1,0 +1,58 @@
+databaseChangeLog:
+  - changeSet:
+      id: changeset_default_name
+      author: KonstantinovD
+      changes:
+        - createTable:
+            tableName: items
+            columns:
+              - column:
+                  name: external_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: items_pk
+              - column:
+                  name: item_date
+                  type: date
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: items_pk
+              - column:
+                  name: name
+                  type: varchar(64)
+              - column:
+                  name: code
+                  type: varchar(64)
+              - column:
+                  name: amount
+                  type: numeric(20,2)
+              - column:
+                  name: seller_id
+                  type: numeric
+        - createTable:
+            tableName: sellers
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: sellers_pk
+              - column:
+                  name: external_id
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(64)
+        - createSequence:
+            sequenceName: s_sellers
+        - addDefaultValue:
+            tableName: sellers
+            columnName: id
+            defaultValueSequenceNext: s_sellers

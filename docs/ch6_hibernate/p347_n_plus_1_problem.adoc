@@ -3,6 +3,8 @@
 *Content:*
 
 - 1. Демонстрация проблемы N+1
+- 2. Массовая выборка данных (batch fetching)
+- 3. @EntityGraph - переопределяем EAGER на LAZY
 
 === 1. Демонстрация проблемы N+1
 
@@ -184,3 +186,42 @@ BatchSize лучше всего использовать на конкретны
 Если, к примеру, batch size установлен на 20, то генерируется 11 BatchingEntityLoader-ов для разных размеров блока IN (20, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 соответственно) для режимов LEGACY/PADDED. И при загрузке 19 сущностей вызываются запросы на 10 и 9. Это позволяет создавать не такое большое количество prepared statements. Источники - link:link:https://rocketscien.se/onetomany[rocketscien.se] и link:https://stackoverflow.com/questions/3469147/how-does-hibernates-batch-fetching-algorithm-work[stackoverflow.com].
 
 Второй автор тоже рекомендует использовать Batch size - link:https://habr.com/ru/companies/rosbank/articles/743536/[habr] - и рассматривает даже пагинацию с решением проблемы N+1.
+
+=== 3. @EntityGraph - переопределяем EAGER на LAZY
+
+Еще один вариант - использовать `@EntityGraph`. Данная тема также рассматривается на link:https://habr.com/ru/companies/rosbank/articles/743536/[habr] в рамках перехода от *_eager_* к *_lazy fetching_*. При этом entityGraph может, наоборот, быть использован для *_eager fetching_*, если мы хотим пойти вглубь графа сущностей и извлечь многоуровневый результат. Однако наиболее важная тема - включение *_lazy fetching_*.
+
+Основные параметры аннотации _@EntityGraph_ - это *_attributePaths_* и *_type_*. Первое представляет из себя список аттрибутов и работает совместно с полем _type_:
+
+- *_type="javax.persistence.loadgraph"_* - все указанные в _attributePaths_ аттрибуты будут загружены с параметром FetchType.EAGER (если к ним применимо это отображение, простые аттрибуты-@Column без маппинга "@<Any>To<Any>", например, всегда загружаются), у не указанных останется их дефолтный FetchType (настроенный в классе entity). Данный граф только добавляет EAGER для указанных пропертей, не отменяя действия уже настроенных параметров FetchType.
+- *_type="javax.persistence.fetchgraph"_* - любые атрибуты и коллекции, не указанные в плане, будут загружены с параметром FetchType.LAZY, а указанные – с параметром FetchType.EAGER. В отличие от *_loadgraph_*, *_fetchgraph_* отменяет действие всех параметров FetchType для атрибутов сущности и отображений коллекций, в то время как *_loadgraph_* вносит только дополнения.
+
+Пример работы с @EntityGraph можно наблюдать в link:../../hibernate-learning/src/main/java/ch6_hibernate/p360_EntityGraph/repository/ItemRepository.java[ItemRepository.java]:
+
+[source, java]
+----
+@Repository
+public interface ItemRepository extends JpaRepository<Item, ItemId> {
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH,
+            attributePaths = {"externalId", "amount"})
+    List<Item> findAll();
+}
+----
+
+И теперь запросы списка Item не будут включать в себя атрибут Seller - *_See_*: link:../../hibernate-learning/src/main/java/ch6_hibernate/p360_EntityGraph/EntityGraphScheduler.java[EntityGraphScheduler.java]:
+
+[source, java]
+----
+transactionalProcessor.runInNewTransaction(() -> {
+    // N+1 проблема решена - запросов к seller нет вообще
+    // И даже composite PK не мешает
+    var items2 = itemRepository.findAll();
+    // Hibernate:
+    // select external_id, item_date, amount, code,
+    //     name, seller_id from items
+    log.info("Общее количество товаров: {}", items2.size());
+});
+----
+Также можно создавать так называемые `@NamedEntityGraph` и размещать их над классами-entity.
+
+При этом видно, что @EntityGraph даже composite primary key не мешает переопределять FetchType *_See_*: link:../../hibernate-learning/src/main/java/ch6_hibernate/p360_EntityGraph/entity/Item.java[Item.java]. Но так бывает не всегда... И об этом мы поговорим далее.
