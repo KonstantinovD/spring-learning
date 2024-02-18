@@ -109,3 +109,78 @@ transactionalProcessor.runInNewTransaction(() -> {
     log.info("Товары: {}", seller.getItems());
 });
 ----
+
+=== 2. Массовая выборка данных (batch fetching)
+
+Как можно решить ситуацию выше?
+
+Во-первых, с помощью аннотации `@BatchSize`. Она работает следующим образом: допустим, как и в предыдущем листинге, Hibernate выбрал объекты товаров link:../../hibernate-learning/src/main/java/ch6_hibernate/p351_batch_size_np1_solution/entity/Item.java[Item.java] и нам надо получить всех продавцов link:../../hibernate-learning/src/main/java/ch6_hibernate/p351_batch_size_np1_solution/entity/Seller.java[Seller.java] этих товаров. При извлечении списка товаров *_Item_* Hibernate создал прокси-объекты *_Seller_*. Тогда при инициализации любого из них Hibernate, зная, что в контексте хранения находится еще несколько экземпляров *_Item_* с прокси-объектами *_Seller_*, инициализирует сразу несколько проксей. Для этого надо над классом link:../../hibernate-learning/src/main/java/ch6_hibernate/p351_batch_size_np1_solution/entity/Seller.java[Seller.java] поставить аннотацию *_@BatchSize_*:
+[source, java]
+----
+@Entity
+@Table(name = "sellers")
+@BatchSize(size = 5)
+public class Seller {
+
+    @Id
+    protected Long id;
+
+    @OneToMany(mappedBy = "seller",
+            cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @BatchSize(size = 5)
+    private List<Item> items = new ArrayList<>();
+
+    // ...
+
+}
+----
+Кроме того, в этом листинге видно, что если мы хотим, наоборот, при выборке большого количества объектов link:../../hibernate-learning/src/main/java/ch6_hibernate/p351_batch_size_np1_solution/entity/Seller.java[Seller.java] инициализировать несколько коллекций `items` сразу - то аннотацию *_@BatchSize_* надо ставить уже над самой коллекцией. В самом классе *_Item_* ничего менять не надо.
+
+В результате имеем достаточно неплохие запросы в link:../../hibernate-learning/src/main/java/ch6_hibernate/p351_batch_size_np1_solution/BatchSizeAnnotationScheduler.java[BatchSizeAnnotationScheduler.java]. Как для выборки с *_Seller_*:
+[source, java]
+----
+transactionalProcessor.runInNewTransaction(() -> {
+    var sellers = sellerRepository.findAll();
+    // Hibernate: select id, external_id, name from sellers
+    sellers.forEach(seller ->
+            log.info(
+                    "Количество товаров у продавца {}: {}",
+                    seller.getName(),
+                    seller.getItems().size()));
+    // N+1 проблема решена - получаем 2 доп запроса вместо 6
+    // Hibernate:
+    // select seller_id, id, name from items where seller_id in (?, ?, ?, ?, ?)
+    // select seller_id, id, name from items where seller_id=?
+});
+----
+
+Так и для выборки с *_Item_*:
+[source, java]
+----
+transactionalProcessor.runInNewTransaction(() -> {
+    // N+1 проблема решена - получаем 2 доп запроса вместо 6
+    var items = itemRepository.findAll();
+    // Hibernate:
+    // select id, name, seller_id from items
+    // select id, external_id, name from sellers where id in (?, ?, ?, ?, ?)
+    // select id, external_id, name from sellers where id=?
+    log.info("Общее количество товаров: {}", items.size());
+});
+
+transactionalProcessor.runInNewTransaction(() -> {
+    // N+1 проблема решена - получаем 1 доп запроc вместо 3
+    var items = itemRepository.findAllById(
+            List.of(itemId0.get(), itemId1.get(), itemId2.get()));
+    // Hibernate:
+    // select id, name, seller_id from items
+    // select id, external_id, name from sellers where id in (?, ?, ?)
+    log.info("Общее количество найденных по id товаров: {}", items.size());
+});
+----
+
+BatchSize лучше всего использовать на конкретных entities, но перебарщивать тоже не стоит, поскольку Hibernate старается оптимизировать выполнение запросов, для чего, в частности, создает prepared statements при загрузке приложения. И при включении batch-логики Hibernate создает для запросов, кроме стандартных EntityLoader-ов, дополнительные инстансы BatchingEntityLoader.
+
+Если, к примеру, batch size установлен на 20, то генерируется 11 BatchingEntityLoader-ов для разных размеров блока IN (20, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 соответственно) для режимов LEGACY/PADDED. И при загрузке 19 сущностей вызываются запросы на 10 и 9. Это позволяет создавать не такое большое количество prepared statements. Источники - link:link:https://rocketscien.se/onetomany[rocketscien.se] и link:https://stackoverflow.com/questions/3469147/how-does-hibernates-batch-fetching-algorithm-work[stackoverflow.com].
+
+Второй автор тоже рекомендует использовать Batch size - link:https://habr.com/ru/companies/rosbank/articles/743536/[habr] - и рассматривает даже пагинацию с решением проблемы N+1.
