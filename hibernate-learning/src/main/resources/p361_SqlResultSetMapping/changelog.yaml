@@ -1,0 +1,70 @@
+databaseChangeLog:
+  - changeSet:
+      id: changeset_default_name
+      author: KonstantinovD
+      changes:
+        - createTable:
+            tableName: items
+            columns:
+              - column:
+                  name: external_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: items_pk
+              - column:
+                  name: item_date
+                  type: date
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: items_pk
+              - column:
+                  name: name
+                  type: varchar(64)
+              - column:
+                  name: code
+                  type: varchar(64)
+              - column:
+                  name: amount
+                  type: numeric(20,2)
+        - createTable:
+            tableName: item_attributes
+            columns:
+              - column:
+                  name: item_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: item_attributes_pk
+              - column:
+                  name: item_date
+                  type: date
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: item_attributes_pk
+              - column:
+                  name: code
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: item_attributes_pk
+              - column:
+                  name: category
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: VALUE
+                  type: varchar(100)
+        - addForeignKeyConstraint:
+            baseColumnNames: item_id, item_date
+            baseTableName: item_attributes
+            constraintName: item_attributes_fk1
+            onDelete: CASCADE
+            referencedColumnNames: external_id, item_date
+            referencedTableName: items

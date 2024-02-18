@@ -5,6 +5,7 @@
 - 1. Демонстрация проблемы N+1
 - 2. Массовая выборка данных (batch fetching)
 - 3. @EntityGraph - переопределяем EAGER на LAZY
+- 4. @SqlResultSetMapping и @NamedNativeQuery - когда EAGER нельзя переопределить
 
 === 1. Демонстрация проблемы N+1
 
@@ -225,3 +226,211 @@ transactionalProcessor.runInNewTransaction(() -> {
 Также можно создавать так называемые `@NamedEntityGraph` и размещать их над классами-entity.
 
 При этом видно, что @EntityGraph даже composite primary key не мешает переопределять FetchType *_See_*: link:../../hibernate-learning/src/main/java/ch6_hibernate/p360_EntityGraph/entity/Item.java[Item.java]. Но так бывает не всегда... И об этом мы поговорим далее.
+
+=== 4. @SqlResultSetMapping и @NamedNativeQuery - когда EAGER нельзя переопределить
+
+А теперь рассмотрим ситуацию, когда плохо спроектирована и внутренняя модель Hibernate, и схема БД.
+
+Дано: два класса - link:../../hibernate-learning/src/main/java/ch6_hibernate/p361_SqlResultSetMapping/entity/Item.java[Item.java] и link:../../hibernate-learning/src/main/java/ch6_hibernate/p361_SqlResultSetMapping/entity/ItemAttribute.java[ItemAttribute.java] с композитными ключами (можно и не композитные, но разницы не будет, проблема не в этом):
+
+[source, java]
+----
+@Embeddable
+public class ItemId implements Serializable {
+    private UUID externalId;
+    private LocalDate itemDate;
+}
+
+@Entity
+@IdClass(ItemId.class)
+@Table(name = "items")
+public class Item {
+
+    @Id
+    @Column(nullable = false, name = "external_id")
+    private UUID externalId;
+
+    @Id
+    @Column(nullable = false, name = "item_date")
+    private LocalDate itemDate;
+
+    private String name;
+
+    private String code;
+
+    private BigDecimal amount;
+
+    @OneToMany(
+            mappedBy = "item",
+            cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<ItemAttribute> attrs = new ArrayList<>();
+
+}
+
+// ------------
+
+@Embeddable
+public class ItemAttributeId implements Serializable {
+    private Item item;
+    private String code;
+}
+
+@Entity
+@IdClass(ItemAttributeId.class)
+@Table(name = "item_attributes")
+public class ItemAttribute {
+
+    @Id
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "external_id", referencedColumnName = "external_id"),
+            @JoinColumn(name = "item_date", referencedColumnName = "item_date")
+    })
+    private Item item;
+
+    @Id
+    @Column(nullable = false)
+    private String code;
+
+    @Column
+    private String value;
+
+}
+----
+
+Проблема этих классов в том, что зависимость *_@ManyToOne_* *_ItemAttribute_* -> *_Item_* помечена как *_@Id_*. И это значит, что при любом извлечении объекта _ItemAttribute_ мы всегда будем извлекать вместе с ним и объект _Item_. *_И даже аннотации_ @EntityGraph/@BatchSize _нам не помогут_* - *_See:_* link:../../hibernate-learning/src/main/java/ch6_hibernate/p361_SqlResultSetMapping/repository/ItemAttributeRepository.java[ItemAttributeRepository.java]:
+[source, java]
+----
+public interface ItemAttributeRepository
+        extends JpaRepository<ItemAttribute, ItemAttributeId> {
+
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH,
+            attributePaths = {"code", "value"})
+    List<ItemAttribute> findAll();
+}
+----
+
+Всё равно имеем проблему N+1 - *_See:_* link:../../hibernate-learning/src/main/java/ch6_hibernate/p361_SqlResultSetMapping/SqlResultSetMappingScheduler.java[SqlResultSetMappingScheduler.java]:
+[source, java]
+----
+transactionalProcessor.runInNewTransaction(() -> {
+    // N+1 проблема - даже entity graph не помогает
+    // из-за @Id Item на ItemAttribute
+    var attributes = attributeRepository.findAll();
+    // Hibernate:
+    // select code, external_id, item_date, value from item_attributes
+    // select external_id, item_date, amount, code, name from items where external_id=? and item_date=?
+    // select external_id, item_date, amount, code, name from items where external_id=? and item_date=?
+    // select external_id, item_date, amount, code, name from items where external_id=? and item_date=?
+    // select external_id, item_date, amount, code, name from items where external_id=? and item_date=?
+    // select external_id, item_date, amount, code, name from items where external_id=? and item_date=?
+    // select external_id, item_date, amount, code, name from items where external_id=? and item_date=?
+    log.info("Общее количество аттрибутов: {}", attributes.size());
+    // Причем это работает даже если fk не composite
+});
+----
+
+Как же ее решать в этом случае? Через *_дополнительный non-entity DTO-класс_*, аннотации `@SqlResultSetMapping` и `@NamedNativeQuery`.
+
+Во-первых, создаем дополнительный DTO-класс link:../../hibernate-learning/src/main/java/ch6_hibernate/p361_SqlResultSetMapping/dto/ItemAttributeDto.java[ItemAttributeDto.java] с типами полей в конструкторе, которые сохраняются в БД (простые типы, String, BigDecimal, LocalDate, etc). То есть, например, enum в конструктор передавать нельзя! (т к неизвестно, маппить ли его на String или на Integer), приходится передавать String и маппить String на enum уже в самом конструкторе:
+[source, java]
+----
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+public class ItemAttributeDto {
+
+    public ItemAttributeDto(UUID itemId, LocalDate itemDate,
+            String code, String value, String category) {
+        this.itemId = itemId;
+        this.itemDate = itemDate;
+        this.code = code;
+        this.value = value;
+        this.category = AttributeCategory.valueOf(category);
+    }
+
+    private UUID itemId;
+    private LocalDate itemDate;
+    private String code;
+    private String value;
+    private AttributeCategory category;
+}
+----
+
+Во-вторых, прописываем аннотации над entity-классом link:../../hibernate-learning/src/main/java/ch6_hibernate/p361_SqlResultSetMapping/entity/ItemAttribute.java[ItemAttribute.java].
+
+- 1) Аннотация *_@SqlResultSetMapping_* допускает гибкую настройку инициализации, но мы рассмотрим здесь стандартный конструктор - аттрибуты в *_column_* будут перечислены в таком порядке, в котором они перечислены в самом конструкторе. +
+Внутренняя аннотация *_@ColumnResult_* должна совпадать по имени с именем извлекаемого результата в native query в аннотации _@NamedNativeQuery_.
+- 2) Аннотация *_@NamedNativeQuery_* (native, поскольку мы не хотим инициализации entity) имеет аттрибут *_resultSetMapping_*, равный имени в аннотации _@SqlResultSetMapping_ (чтобы связать эти две аннотации вместе). Второй важный аттрибут - *_query_* - содержит саму raw sql query с извлечением необходимых результатов.
+
+[source, java]
+----
+// невозможно в category установить поле типа enum - AttributeCategory
+@SqlResultSetMapping(
+        name = "itemAttributesDtoMapping",
+        classes = @ConstructorResult(
+                targetClass = ItemAttributeDto.class,
+                columns = {
+                        @ColumnResult(name = "item_id", type = UUID.class),
+                        @ColumnResult(name = "item_date", type = LocalDate.class),
+                        @ColumnResult(name = "code", type = String.class),
+                        @ColumnResult(name = "value", type = String.class),
+                        @ColumnResult(name = "category", type = String.class)
+                }
+        )
+)
+@NamedNativeQuery(
+        name = "itemAttributesMapping",
+        query =
+                """
+                select code, item_id, item_date, value, category from item_attributes
+                where item_id in :itemIds and item_date = :itemDate and category = :category
+                """,
+        resultClass = ItemAttributeDto.class,
+        resultSetMapping = "itemAttributesDtoMapping"
+)
+@Entity
+@Table(name = "item_attributes")
+public class ItemAttribute { ... }
+----
+
+И потом всю эту "мишуру" элегантно прописываем в репозитории link:../../hibernate-learning/src/main/java/ch6_hibernate/p361_SqlResultSetMapping/repository/ItemAttributeRepository.java[ItemAttributeRepository.java]:
+[source, java]
+----
+public interface ItemAttributeRepository
+        extends JpaRepository<ItemAttribute, ItemAttributeId> {
+
+    // невозможно установить аргумент типа enum - AttributeCategory
+    @Query(nativeQuery = true, name = "itemAttributesMapping")
+    List<ItemAttributeDto> findByItemIdInAndItemDate(
+            Collection<UUID> itemIds,
+            LocalDate itemDate,
+            String category);
+
+}
+----
+
+Что в совокупности дает нам нормальный sql-запрос (link:../../hibernate-learning/src/main/java/ch6_hibernate/p361_SqlResultSetMapping/SqlResultSetMappingScheduler.java[SqlResultSetMappingScheduler.java]):
+[source, java]
+----
+transactionalProcessor.runInNewTransaction(() -> {
+    // N+1 проблема решена т к в самой DTO нету
+    // ссылки на Item - это не Entity
+    //
+    // Однако есть некоторые ограничения в конвертации - например,
+    // нельзя поставить Enum в параметры
+    // Поэтому нельзя в category установить поле типа AttributeCategory.INT
+    var attributes = attributeRepository.findByItemIdInAndItemDate(
+            itemIds, current, AttributeCategory.INT.name());
+    // Hibernate:
+    // select code, item_id, item_date, value, category from item_attributes
+    // where item_id in (?, ?, ?, ?, ?, ?) and item_date = ? and category = ?
+    log.info("Общее количество аттрибутов категории INT: {}", attributes.size());
+    // Общее количество аттрибутов категории INT: 6
+});
+----
+
+Из минусов: и в конструкторе дтошки, и в запросах к БД должны быть только хранимые в БД типы. Enum - нельзя! Поэтому и приходится в параметрах передавать значения Entity как `AttributeCategory.INT.name()`.
