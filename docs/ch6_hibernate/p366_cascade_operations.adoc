@@ -1,0 +1,57 @@
+== Каскадные операции
+
+*Content:*
+
+- 1. Способы каскадирования
+- 2. Каскадное обновление (CascadeType.REFRESH) - неоптимальное
+
+=== 1. Способы каскадирования
+
+Все способы каскадирования, доступные в Hibernate, перечислены ниже. Обратите внимание, что каждый из них связан либо с EntityManager, либо с Session:
+
+- *_CascadeType.PERSIST_* - вызов `em.persist()` переведет в хранимое состояние ведущий и связанный экземпляры сущности
+- *_CascadeType.MERGE_* - вызов `em.merge()` произведет слияние для ведущего и связанного экземпляров сущности
+- *_CascadeType.REMOVE_* - вызов `em.remove()` удалит ведущий и связанный экземпляры сущности
+- *_CascadeType.DETACH_* - вызов `em.remove()` отсоединит ведущий и связанный экземпляры сущности от контекста хранения
+- *_CascadeType.REFRESH_* - вызов `em.refresh()` обновит ведущий и связанный экземпляры сущности значениями из бд
+- *_CascadeType.ALL_* - эквивалент `cascade=[PERSIST, MERGE, REMOVE, REFRESH, DETACH]`.
+- *_org.hibernate.annotations.CascadeType.REPLICATE_* - вызов `Session#replicate()` скопирует ведущий и связанный экземпляры сущности в другую бд
+
+=== 2. Каскадное обновление (CascadeType.REFRESH) - неоптимальное
+
+Допустим, у нас есть два класса - User и BillingDetails - связанные отношением one-to-many. Для этой ассоциации указаны CascadeType PERSIST и REFRESH.
+[source, java]
+----
+@Entity
+@Table(name = "USERS")
+public class User {
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinColumn(name = "USER_ID", nullable = false)
+    protected Set<BillingDetails> billingDetails = new HashSet<>();
+    // ...
+}
+----
+
+Существует такая архитектура, в которой контекст хранения остается открытым на протяжении долгого времени, что ведет к устареванию данных в entities. Поэтому нужно повторно читать информацию из базы данных. Параметр CascadeType.REFRESH гарантирует, что при перезагрузке экземпляра User Hibernate также обновит состояние каждого объекта BillingDetails, связанного с экземпляром User:
+
+[source, java]
+----
+User user = em.find(User.class, USER_ID);
+assertEquals(user.getBillingDetails().size(), 2);
+for (BillingDetails bd : user.getBillingDetails()) {
+    assertEquals(bd.getOwner(), "John Doe");
+}
+
+// Кто-то изменил платежные реквизиты в базе данных!
+
+em.refresh(user); // Обновляет экземпляры BillingDetails
+// select * from BILLINGDETAILS where ID = ?
+// select * from USERS
+//   left outer join BILLINGDETAILS
+//   where ID = ?
+for (BillingDetails bd : user.getBillingDetails()) {
+    assertEquals(bd.getOwner(), "Doe John");
+}
+----
+
+И в этом случае Hibernate действует не оптимально. Сначала он выполнит SQL-выражение SELECT для каждого экземпляра BillingDetails из коллекции, а затем загрузит всю коллекцию снова, чтобы обнаружить добавленный экземпляр BillingDetails. Очевидно, что все это можно сделать одним выражением SELECT.
