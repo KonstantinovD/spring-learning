@@ -1,0 +1,59 @@
+== Подготовка к презентации
+
+=== Список тем
+
+- Внутренние транзакции - блокировки строк - link:sn001_inner_transaction[] (5 мин)
+- Наследование - link:p151_jpa_inheritance_mapping[], link:p170_polymorphic_associations[]. Плюс - *_@MappedSuperclass_* может быть множественным (10 мин)
+
+- Hibernate создает копии исходного состояния объекта. Dirty checking - link:p277_entityManager[] - все это потом переводится в EntityEntry и можно получить через Interceptor link:../../hibernate-learning/src/main/java/ch6_hibernate/p378_interceptors/interceptor/AuditLogInterceptor.java[AuditLogInterceptor.java] (5-10 мин) - однако это касается только отдельных объектов... поскольку Strings/Integers/BigDecimals - immutable. Зато dirty checking исполняется всегда.
+
+- Проблемы `@GeneratedValue(strategy = GenerationType.IDENTITY)`, нет батчевых вставок, может помешать батчевым операциям других сущностей с `GenerationType.SEQUENCE` - link:p279_insert_id_order[] (5 мин)
+
+- N+1 проблема - link:p347_n_plus_1_problem[] (15 мин)
+
+*Допы:*
+
+- Копии коллекций не будут сохраняться нормально при dirty checking - link:p065_presisted_object_and_properties_for_hb[4. Замена коллекции движком Hibernate через доступ к переменной-члену]
+
+=== Порядок исполнения
+
+- 0.1) Хитрости и неочевидные особенности Hibernate - заголовок
+- 0.2) Что такое JPA/Hibernate
+ - много хитростей и неоднозначности
+ - кастомизация не всегда подходит
+ - мб не самое производительное но неплохое решение
+
+
+
+- 1) Введение про транзакции - link:p273_jpa_entities_lifecycle[] и link:p277_entityManager[] - единица работы и сброс сессии - сброс всех операторов sql
+
+- 2) Проблемы `@GeneratedValue(strategy = GenerationType.IDENTITY)`, нет батчевых вставок, может помешать батчевым операциям других сущностей с `GenerationType.SEQUENCE` - link:p279_insert_id_order[] (5 мин)
+
+- 3) Hibernate создает копии исходного состояния объекта. Dirty checking - link:p277_entityManager[] - все это потом переводится в EntityEntry и можно получить через Interceptor link:../../hibernate-learning/src/main/java/ch6_hibernate/p378_interceptors/interceptor/AuditLogInterceptor.java[AuditLogInterceptor.java] (5-10 мин) - однако это касается только отдельных объектов... поскольку Strings/Integers/BigDecimals - immutable. Зато dirty checking исполняется всегда.
+
+- 4) Внутренние транзакции - блокировки строк - link:sn001_inner_transaction[] (5 мин)
+
+- 6) N+1 проблема (Lazy-загрузка) - link:p347_n_plus_1_problem[] (15 мин)
+
+- 7) Наследование - link:p151_jpa_inheritance_mapping[], link:p170_polymorphic_associations[]. Плюс - *_@MappedSuperclass_* может быть множественным (10 мин)
+
+
+
+Хитрости и неочевидные особенности Hibernate
+
+
+Очередь событий - link:https://medium.com/@yevhenii.kukhol/how-is-your-data-actually-flushed-hibernate-actionqueue-event-priorities-d89bc4a91db4[]
+
+
+
+1) Очередь SQL-операторов Hibernate
+2) Почему мы не используем identity-генераторы для ID
+3) REQUIRED_NEW транзакции и блокировки строк или как устроить дедлок на ровном месте
+4) N+1 проблема и способы ее решения
+5) N+1 проблема и внешние первичные ключи в Hibernate
+
+savepoints не работают в HB:
+link:https://stackoverflow.com/questions/12390888/differences-between-requires-new-and-nested-propagation-in-spring-transactions[], +
+link:https://discourse.hibernate.org/t/trying-to-rollback-to-savepoint-when-transaction-has-status-marked-rollback/1712[]
+
+Почему GenerationType.TABLE плохой: link:https://vladmihalcea.com/why-you-should-never-use-the-table-identifier-generator-with-jpa-and-hibernate/[vladmihalcea.com]

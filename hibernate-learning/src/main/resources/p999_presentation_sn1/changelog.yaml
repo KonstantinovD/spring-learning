@@ -1,0 +1,95 @@
+databaseChangeLog:
+  - changeSet:
+      id: changeset_default_name
+      author: KonstantinovD
+      changes:
+        - createTable:
+            tableName: items
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: items_pk
+              - column:
+                  name: external_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+        - createSequence:
+            sequenceName: s_items
+        - addDefaultValue:
+            tableName: items
+            columnName: id
+            defaultValueSequenceNext: s_items
+#        - createIndex:
+#            tableName: items
+#            columns:
+#              - column:
+#                  name: name
+#            unique: true
+#            indexName: items_UI1
+        - createIndex:
+            tableName: items
+            columns:
+              - column:
+                  name: external_id
+            unique: true
+            indexName: items_UI1
+        - createTable:
+            tableName: payments
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: payments_pk
+              - column:
+                  name: account_number
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: amount
+                  type: numeric(19,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(16)
+                  constraints:
+                    nullable: false
+        - createSequence:
+            sequenceName: s_payments
+        - addDefaultValue:
+            tableName: payments
+            columnName: id
+            defaultValueSequenceNext: s_payments
+  - changeSet:
+      id: changeset_default_name_2
+      author: KonstantinovD
+      changes:
+        - insert:
+            tableName: payments
+            columns:
+              - column:
+                  name: id
+                  valueSequenceNext: s_payments
+              - column:
+                  name: account_number
+                  value: account_1
+              - column:
+                  name: amount
+                  valueNumeric: 4500.00
+              - column:
+                  name: status
+                  value: ERROR
