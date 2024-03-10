@@ -1,0 +1,5 @@
+=== Notes 2024
+
+- Полезный сайт программиста который подготовил кучу статей по подготовке к собесам - здесь куча интересных библиотек https://github.com/Vedenin/useful-java-links/tree/master/link-rus
+
+- Запросы для вложенного объекта - link:https://www.javacodegeeks.com/2020/09/spring-boot-data-jpa-query-for-nested-object.html[ссылка].
