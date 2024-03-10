@@ -70,6 +70,10 @@ public class InsertIdOrderScheduler {
             int ignored = 11;
             // ЛОГИ HIBERNATE - произошел только insert address
             // Hibernate: insert into addresses (id, city_name, country_name, user_id) values (null, ?, ?, ?)
+            //
+            // НО! если бы было addressRepository.saveAndFlush(address3);
+            // То было бы исполнено и update, и delete
+            //
         });
         // ЛОГИ HIBERNATE - и только по окончанию транзакции - update и delete
         // Hibernate: update users set name=? where id=?
