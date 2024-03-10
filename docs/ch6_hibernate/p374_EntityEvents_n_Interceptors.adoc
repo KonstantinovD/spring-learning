@@ -1,0 +1,116 @@
+== Прием и обработка событий HB/JPA. Перехватчики событий
+
+=== 1. Пример класса-листенера событий
+
+Рассмотрим пример листенера событий жизненного цикла JPA:
+[source, java]
+----
+public class PersistEntityListener {
+
+    // Аннотация превращает метод notfyAdmin() в коллбэк
+    @PostPersist
+    public void notifyAdmin(Object entityInstance) {
+        User currentUser = CurrentUser.INSTANCE.get();
+        Mail mail = Mail.INSTANCE;
+        mail.send(
+            "Entity instance persisted by "
+                + currentUser.getUsername()
+                + ": " + entityInstance
+        );
+    }
+}
+----
+
+Особенности класса-листенера событий:
+
+- 1) Класс-листенер событий жизненного цикла сущностей должен иметь конструктор без аргументов. От класса не требуется реализовать какой-то специальный интерфейс.
+- 2) Класс листенера событий не имеет состояния, а его экземпляры автоматически создаются и уничтожаются JPA.
+- 3) Любой метод класса-листенера можно отметить аннотацией как колбэк. Метод *_notifyAdmin()_* в данном примере будет вызываться после сохранения нового экземпляра сущности в базу данных.
+- 4) Каждую аннотацию колбэка можно использовать в определении приемника событий только один раз, т. е. лишь один метод может быть отмечен аннотацией @PostPersist.
+
+Листенер может использовать зависимости как и обычный класс, через @Autowired или @Inject. Однако таким образом нельзя внедрить объект entityManager, который, однако, можно внедрить другим способом.
+
+=== 1.1 Метод обратного вызова (колбэк)
+
+Метод обратного вызова принимает единственный параметр типа *_Object_* - экземпляр сущности, меняющий состояние. Если понадобится определить колбэк для конкретного типа сущности, нужно указать конкретный тип параметра. Чтобы организовать прием событий, возникающих в конкретной сущности, необходимо явно указать класс (классы) приемника событий перед объявлением entity, например:
+[source, java]
+----
+@Entity
+@EntityListeners(
+    PersistEntityListener.class
+)
+public class Item {
+    // ...
+}
+----
+
+Метод-колбэк может иметь любой модификатор доступа, не должен быть ни статическим, ни финальным и не должен ничего не возвращать. Если колбэк выкинет RuntimeException, Hibernate отменит выполняемую операцию и откатит текущую транзакцию. Если же колбэк выкинет checked Exception, Hibernate завернет его в RuntimeException - и опять откатит транзакцию.
+
+=== 2. Список аннотаций для колбэков
+
+- *_@PostLoad_* -Вызывается после загрузки entity в контекст хранения, либо в результате поиска по ID, в ходе инициализации прокси-объекта/коллекции, либо при выполнении запроса. Метод также вызывается после изменения уже хранимого экземпляра.
+- *_@PrePersist_* - Вызывается сразу после вызова операции persist() для экземпляра сущности. Также вызывается после выполнения операции merge() для transient сущности, когда ее transient-состояние будет скопировано в хранимый экземпляр сущности. Метод также будет вызван для каскадных связей CascadeType.PERSIST.
+- *_@PostPersist_* - Вызывается после сохранения экземпляра сущности в базе данных и присваивания ему значения ID. Это может произойти либо после операций persist() или merge(), либо позже, во время выталкивания контекста хранения, если генератор идентификаторов срабатывает перед вставкой (например, при *_GenerationType.IDENTITY_*). Метод также будет вызван для каскадных связей CascadeType.PERSIST.
+- *_@PreUpdate, @PostUpdate_* - вызываются перед и после операции обновления соответственно. Следует отметить, что колбэк @PreUpdate вызывается только в том случае, если данные действительно изменяются, то есть если необходимо выполнить SQL-выражение. Колбэк @PostUpdate вызывается независимо от того, действительно ли что-то изменилось. @PreUpdate может быть использован для перехвата событий модификации в классе типа ModificationListener для проставления поля row_update_datetime.
+- *_@PreRemove, @PostRemove_* - Вызываются перед или после исполнения remove() или каскадного удаления, а также после удаления записи из базы данных, когда происходит выталкивание контекста хранения.
+
+Для операций *_@PostPersist_*, *_@PostRemove_* и *_@PostUpdate_* в документации сказано, что эти события могут произойти сразу после выполнения операции, после сброса или в конце транзакции.
+
+=== 3. Entity может быть листенером своих событий
+
+Entity может слушать собственные события. Самый яркий пример - это установка дефолтных значений/обновление row_insert_datetime:
+[source, java]
+----
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+public class Item {
+
+    @Id // без генератора
+    @Column(name = "name", nullable = false)
+    private UUID name;
+
+    @Column(name = "row_insert_datetime", nullable = false)
+    private LocalDateTime rowInsertDateTime;
+
+    @Column(name = "row_update_datetime", nullable = false)
+    private LocalDateTime rowUpdateDateTime;
+
+    @Transient
+    private boolean isNew = true;
+
+
+    @PrePersist
+    void generateMissing() {
+        if (getName() == null) {
+            setName(UUID.randomUUID());
+        }
+        setRowInsertDateTime(LocalDateTime.now());
+        setRowUpdateDateTim(getRowInsertDateTime());
+    }
+
+}
+----
+
+[source, java]
+----
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+public class Review {
+
+    // ...
+
+    @Transient
+    private boolean isNewReview = true;
+
+    @PrePersist
+    @PostLoad
+    void markNotNew() {
+        this.isNewReview = false;
+    }
+
+}
+----
+
+Также можно посмотреть на link:https://www.baeldung.com/jpa-entity-lifecycle-events[baeldung - jpa-entity-lifecycle-events].

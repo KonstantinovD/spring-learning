@@ -1,0 +1,91 @@
+databaseChangeLog:
+  - changeSet:
+      id: changeset_default_name
+      author: KonstantinovD
+      changes:
+        - createTable:
+            tableName: items
+            columns:
+              - column:
+                  name: external_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: items_pk
+              - column:
+                  name: item_date
+                  type: date
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: items_pk
+              - column:
+                  name: name
+                  type: varchar(64)
+              - column:
+                  name: code
+                  type: varchar(64)
+              - column:
+                  name: amount
+                  type: numeric(20,2)
+              - column:
+                  name: seller_id
+                  type: numeric
+              - column:
+                  name: twice_id
+                  type: uuid
+              - column:
+                  name: int_amount1
+                  type: int
+              - column:
+                  name: int_amount2
+                  type: int
+              - column:
+                  name: int_amount3
+                  type: int
+              - column:
+                  name: int_amount4
+                  type: int
+              - column:
+                  name: long_amount1
+                  type: bigint
+              - column:
+                  name: long_amount2
+                  type: bigint
+              - column:
+                  name: long_amount3
+                  type: bigint
+              - column:
+                  name: long_amount4
+                  type: bigint
+              - column:
+                  name: date_value
+                  type: date
+              - column:
+                  name: time_value
+                  type: timestamp
+        - createTable:
+            tableName: sellers
+            columns:
+              - column:
+                  name: id
+                  type: numeric
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: sellers_pk
+              - column:
+                  name: external_id
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(64)
+        - createSequence:
+            sequenceName: s_sellers
+        - addDefaultValue:
+            tableName: sellers
+            columnName: id
+            defaultValueSequenceNext: s_sellers
