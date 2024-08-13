@@ -91,7 +91,7 @@ This project is used for in-depth study of Spring Framework.
 │   │   ├── executorServiceExample/ExecutorServiceExample.java
 │   │   │   ...
 │   │   ├── ScheduledExecutorServiceExample.java
-│   ├── sn10_stackowerflow
+│   ├── sn10_stackoverflow
 │   ├── sn11_generics
 │   ├── sn12_strings
 ```
