@@ -39,7 +39,7 @@ This project is used for in-depth study of Spring Framework.
                                   Java memory model, 
                                   Hibernate transaction propagation)
 │   │
-│   ├── spring                                  [Книга Spring for Professionals + отдельные SNippets] 
+│   ├── spring                                  [Книга Spring for Professionals + отдельные Snippets] 
 │   │   ├── ...
 ```
 
