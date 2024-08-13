@@ -10,6 +10,7 @@
         <module>protobuf-learning</module>
         <module>spring-learning-src</module>
         <module>hibernate-learning</module>
+        <module>architecture2</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
