@@ -1,0 +1,6 @@
+Полезные ссылки
+
+1) Чистая архитектура на практике. Как раскладывать файлы по папкам и по проектам в рамках чистой инфраструктуры и DDD:
+Ютуб видео - https://www.youtube.com/watch?v=GW1sN7OLTXo
+
+2) Про link:https://habr.com/ru/companies/jugru/articles/440772/[DDD - habe]
