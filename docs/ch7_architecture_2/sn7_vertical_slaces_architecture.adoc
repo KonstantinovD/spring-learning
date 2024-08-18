@@ -1,6 +1,6 @@
 == Vertical Slices архитектура (VSA)
 
-link:https://medium.com/@andrew.macconnell/exploring-software-architecture-vertical-slice-789fa0a09be6[ссылка 1]
+link:https://medium.com/@andrew.macconnell/exploring-software-architecture-vertical-slice-789fa0a09be6[ссылка 1], link:https://www.baeldung.com/java-vertical-slice-architecture[ссылка 2]
 
 [cols="2,1"]
 |===
