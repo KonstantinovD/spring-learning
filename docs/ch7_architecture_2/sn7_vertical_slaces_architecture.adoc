@@ -70,3 +70,9 @@ image:img/sliced_arch_weather_forecast_3.png[]
 
 1. *_Потенциальное дублирование между срезами_*. По мере роста приложения и списка функций дублирование идентичного кода может стать проблемой, если вовремя не проводить рефакторинг.
 2. *_Сложнее стандартизировать шаблоны и подходы_*. Учитывая, что каждый срез решает свою собственную задачу, может быть сложно стандартизировать подходы и шаблоны при создании новых срезов.
+
+=== 4. Sliced architecture и use-cases
+
+В link:https://www.baeldung.com/java-vertical-slice-architecture[ссылка 2] приведен пример проекта, который в slices использует use-cases подход. Это тоже подход к организации кода, однако стоит разделять sliced architecture и use-cases. Поскольку use-cases относится больше к разделу clean architecture и представляет собой отдельный принцип организации слоев приложения и взаимодействия между ними. Однако в этой статейке мы его не рассматриваем.
+
+Подробнее про use-cases в clean architecture - link:https://habr.com/ru/companies/mobileup/articles/335382/[habr], link:https://engineering.teknasyon.com/usecase-red-flags-and-best-practices-in-clean-architecture-76e2f6d921eb[medium]
