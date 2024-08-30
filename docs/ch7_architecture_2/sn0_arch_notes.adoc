@@ -4,3 +4,12 @@
 Ютуб видео - https://www.youtube.com/watch?v=GW1sN7OLTXo
 
 2) Про link:https://habr.com/ru/companies/jugru/articles/440772/[DDD - habe]
+
+3) Вместо шедулеров - события - link:https://verraes.net/2019/05/patterns-for-decoupling-distsys-passage-of-time-event/[Событие «Прохождение времени»]
+
+4) Hexagon архитектура - проблема с транзакциями
+
+5) Заблуждения clean architecture - link:https://habr.com/ru/companies/mobileup/articles/335382/[habr]
+
+6) В Java Spring надо ввести следующее допущение - Domain Model знает о БД через аннотации. Альтернатива - маппить Hibernate Entity в DDD Entity (POJO). Это не очень хорошая штука. +
+Некоторые утверждают, что маппить данные обязательно между всеми слоями. Но это может породить большое количество дублирующихся представлений одних и тех же данных. А можно использовать DTO из слоя Entities везде во внешних слоях. Конечно, если те могут его использовать. Нарушения Dependency Rule тут нет.
