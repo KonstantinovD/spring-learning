@@ -1,6 +1,6 @@
 == Service-Based Architecture
 
-link:https://skillbox.ru/media/code/servicebased-architecture-sem-raz-otmer-odin-raz-popili-monolit/[ссылка - skillbox]
+link:https://skillbox.ru/media/code/servicebased-architecture-sem-raz-otmer-odin-raz-popili-monolit/[skillbox], link:https://www.linkedin.com/pulse/service-based-architecture-soa-thomas-saied/[linkedin], link:https://phoenixnap.com/kb/acid-vs-base[acid-vs-base]
 
 [cols="2,1"]
 |===
