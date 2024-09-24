@@ -18,7 +18,7 @@
 |Reliability (надежность) |[big green]#*4/5*#
 |Масштабируемость (Scalability) |[big lime]#*5/5*#
 |Простота |[big red]#*1/5*#
-|Тестируемость |[big red]#*1/5*#
+|Тестируемость |[big red]#*1/5*# $\color{red}{1/5}$
 |===
 
 $\color{green}{test}$
