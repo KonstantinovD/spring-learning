@@ -66,14 +66,14 @@ Saga также может бытьиспользована как хороша�
 |===
 |Тип коммуникации |Тип Saga |Coupling |Сложность |Отывчивость/доступность |Масштабируемость/эластичность
 
-|synchronous |orchestrated |$\color{red}{HIGH}$ |$\color{green}{VERY LOW}$ |$\color{Dandelion}{MEDIUM}$|$\color{YellowGreen}{HIGH}$
+|synchronous |orchestrated |$\color{red}{HIGH}$ |$\color{green}{VERY \space LOW}$ |$\color{Dandelion}{MEDIUM}$|$\color{YellowGreen}{HIGH}$
 
 |synchronous |choreographed |$\color{Dandelion}{MEDIUM}$ |$\color{YellowGreen}{LOW}$ |$\color{Dandelion}{MEDIUM}$|$\color{YellowGreen}{HIGH}$
 
 
 |asynchronous |orchestrated |$\color{YellowGreen}{LOW}$ |$\color{red}{LOW}$ |$\color{YellowGreen}{HIGH}$|$\color{YellowGreen}{HIGH}$
 
-|asynchronous |choreographed |$\color{green}{VERY LOW}$ |$\color{YellowGreen}{HIGH}$ |$\color{YellowGreen}{HIGH}$|$\color{green}{VERY HIGH}$
+|asynchronous |choreographed |$\color{green}{VERY \space LOW}$ |$\color{YellowGreen}{HIGH}$ |$\color{YellowGreen}{HIGH}$|$\color{green}{VERY \space HIGH}$
 |===
 
 Выбор типа саги это всегда компромисс между перечисленными аттрибутами качества.
