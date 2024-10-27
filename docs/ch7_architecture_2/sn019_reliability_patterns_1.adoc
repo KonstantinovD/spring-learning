@@ -321,7 +321,7 @@ image:img/queue_based_load_1.png[]
 
 === 10. Health Endpoint Monitoring pattern
 
-lСм статью ink:https://learn.microsoft.com/ru-ru/azure/architecture/patterns/health-endpoint-monitoring[microsoft]
+См статью link:https://learn.microsoft.com/ru-ru/azure/architecture/patterns/health-endpoint-monitoring[microsoft]
 
 Реализуйте мониторинг работоспособности, отправляя запросы к эндпоинту приложения. Приложение должно выполнить необходимые проверки, а затем возвращать свой статус.
 
